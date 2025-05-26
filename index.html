@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>게임 시작 화면</title>
+  <link rel="stylesheet" href="start.css">
+  <script src="start.js"></script>
+</head>
+<body>
+  <div class="background-box">
+    <div class="settings" onclick="playSound()"></div>
+    <button class="btn" onclick="startGame()">게임 시작</button>
+    <button class="btn" onclick="location.href='howto.html'">게임 방법</button>
+    </div>
+  </div>
+
+  <audio id="hoverSound" src="res/gameStrat_hoverSound.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="res/gameStart_clickSound.mp3" preload="auto"></audio>
+</body>
+</html>
