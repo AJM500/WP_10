@@ -1,0 +1,70 @@
+/* start.css */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  overflow: hidden;
+}
+
+.background-box {
+  position: relative;
+  width: 1000px;
+  height: 600px;
+  background: url('res/gameStart_background.png') no-repeat center center;
+  background-size: cover;
+  border-radius: 30px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.settings {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 35px;
+  height: 35px;
+  background-image: url('https://img.icons8.com/ios-filled/50/000000/settings.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+.settings:hover {
+  transform: rotate(30deg);
+}
+
+.btn {
+  display: block;
+  width: 220px;
+  padding: 14px;
+  margin: 18px auto;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 2px solid #555;
+  border-radius: 12px;
+  color: #222;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  backdrop-filter: blur(2px);
+}
+
+.btn:hover {
+  background-color: rgba(180, 200, 255, 0.95);
+  color: #000;
+  transform: scale(1.05);
+}
