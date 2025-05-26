@@ -1,0 +1,47 @@
+/* WP_10.css */
+/*init*/
+*{
+	margin: 0px;
+	padding: 0px;
+}
+body{
+	width: auto;
+	margin: 0px auto;
+}
+
+li{
+	list-style: none;
+}
+
+a{
+	text-decoration: none;
+}
+
+/* header */
+header{
+    width: 960px;
+    height: 80px;
+    background-color: #888;
+    position: fixed;
+    top: 0;
+    padding: 40px 30px 0px 30px ;
+}
+/* header title 세팅 (임시)*/
+#title{
+    font-family: 'Times New Roman', Times, serif;
+    height: 40px;
+	text-align: center;
+	font-size: 30px;
+	font-weight: bold;
+	color: #000;
+}
+
+/* canvas style 세팅 */
+canvas {
+    display: block;
+    margin: 150px auto;
+    border: 2px solid #000;
+    background-color: #ddd;
+}
+
+/* 추가 바람 */
