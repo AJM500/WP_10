@@ -6,7 +6,7 @@ const directions = { down: 0, left: 1, right: 2, up: 3 };
 
 
 const playerImage = new Image();
-playerImage.src = "player_boy.png";  // ← 새 파일명
+playerImage.src = "res/player_boy.png";  // ← 새 파일명
 
 let player = {
   x: 0,
