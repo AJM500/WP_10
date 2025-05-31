@@ -44,20 +44,41 @@ for (let c = 0; c < blockColumnCount; c++) {
     }
 }
 
-// 이미지 로드 설정 (발판 및 블럭 이미지 placeholder)
 const barImage = new Image();
-barImage.src = "https://via.placeholder.com/100x20"; // placeholder 이미지
 const blockImage = new Image();
-blockImage.src = "https://via.placeholder.com/100x20/FF0000/FFFFFF"; // placeholder 이미지
-
 let imagesLoaded = 0;
+
+barImage.src = "https://via.placeholder.com/100x20";
+blockImage.src = "https://via.placeholder.com/100x20/FF0000/FFFFFF";
+
+// 이미지 로딩 상태 확인 함수
+function checkImagesLoaded() {
+    imagesLoaded++;
+    if (imagesLoaded === 2) {
+        requestAnimationFrame(draw);
+    }
+}
+
+// 이미지 로딩 실패 시에도 게임 시작
+function handleImageError() {
+    console.warn("이미지 로딩 실패, 기본 스타일로 진행합니다.");
+    requestAnimationFrame(draw);
+}
+
+// 이벤트 등록
 barImage.onload = checkImagesLoaded;
 blockImage.onload = checkImagesLoaded;
 
-function checkImagesLoaded() {
-    imagesLoaded++;
-    if (imagesLoaded === 2) requestAnimationFrame(draw);
-}
+barImage.onerror = handleImageError;
+blockImage.onerror = handleImageError;
+
+// 이미지 로딩 상태 확인 후 강제로 게임 시작하는 타이머 설정 (5초 후 무조건 실행)
+setTimeout(() => {
+    if (imagesLoaded < 2) {
+        console.warn("이미지 로딩 지연, 강제 게임 시작");
+        requestAnimationFrame(draw);
+    }
+}, 5000);
 
 // 키보드 입력 처리용 변수
 let rightPressed = false;
