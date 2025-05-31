@@ -7,8 +7,8 @@ const ctx = canvas.getContext("2d");
 // 공의 초기 위치와 이동 속도 설정
 let x = canvas.width / 2;
 let y = canvas.height - 30;
-let dx = 2;
-let dy = -2;
+let dx = 6;
+let dy = -6;
 const ballRadius = 10;
 
 // 바(패들)의 설정
@@ -48,8 +48,8 @@ const barImage = new Image();
 const blockImage = new Image();
 let imagesLoaded = 0;
 
-barImage.src = "https://via.placeholder.com/100x20";
-blockImage.src = "https://via.placeholder.com/100x20/FF0000/FFFFFF";
+barImage.src = "https://placehold.co/100x20/orange/white";
+blockImage.src = "https://placehold.co/100x20/FF0000/FFFFFF";
 
 // 이미지 로딩 상태 확인 함수
 function checkImagesLoaded() {
