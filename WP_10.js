@@ -6,9 +6,9 @@ const ctx = canvas.getContext("2d");
 
 // 공의 초기 위치와 이동 속도 설정
 let x = canvas.width / 2;
-let y = canvas.height - 30;
-let dx = 2;
-let dy = -2;
+let y = canvas.height * 0.6;
+let dx = 0;
+let dy = 2;
 const ballRadius = 10;
 
 // 바(패들)의 설정
@@ -48,8 +48,8 @@ const barImage = new Image();
 const blockImage = new Image();
 let imagesLoaded = 0;
 
-barImage.src = "https://via.placeholder.com/100x20";
-blockImage.src = "https://via.placeholder.com/100x20/FF0000/FFFFFF";
+barImage.src = "https://placehold.co/100x20/orange/white";
+blockImage.src = "https://placehold.co/100x20/FF0000/FFFFFF";
 
 // 이미지 로딩 상태 확인 함수
 function checkImagesLoaded() {
@@ -80,35 +80,62 @@ setTimeout(() => {
     }
 }, 5000);
 
-// 키보드 입력 처리용 변수
-let rightPressed = false;
-let leftPressed = false;
+// 마우스 이동 이벤트
 
-document.addEventListener('keydown', keyDownHandler);
-document.addEventListener('keyup', keyUpHandler);
+canvas.addEventListener('mousemove', mouseMoveHandler);
 
-function keyDownHandler(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = true;
-    if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = true;
+function mouseMoveHandler(e) {
+    const rect = canvas.getBoundingClientRect();
+    const relativeX = e.clientX - rect.left;
+
+    if (relativeX > 0 && relativeX < canvas.width) {
+        barPosX = relativeX - barWidth / 2;
+    }
 }
 
-function keyUpHandler(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") rightPressed = false;
-    if (e.key === "Left" || e.key === "ArrowLeft") leftPressed = false;
-}
+
+
 
 function collisionDetection() {
     for (let c = 0; c < blockColumnCount; c++) {
         for (let r = 0; r < blockRowCount; r++) {
             const b = blocks[c][r];
             if (b.status === 1) {
-                if (x > b.x && x < b.x + blockWidth && y > b.y && y < b.y + blockHeight) {
-                    dy = -dy;
+                // 충돌 여부 확인 (공 중심 + 반지름 고려)
+                const collided =
+                    x + ballRadius > b.x &&
+                    x - ballRadius < b.x + blockWidth &&
+                    y + ballRadius > b.y &&
+                    y - ballRadius < b.y + blockHeight;
+
+                if (collided) {
+                    // ✅ 블럭 체력 감소
                     b.hits--;
                     if (b.hits <= 0) {
                         b.status = 0;
                         score += 10;
                     }
+
+                    // ✅ 충돌 방향 판별: 상하 vs 좌우
+                    const prevX = x - dx;
+                    const prevY = y - dy;
+
+                    const hitFromLeft = prevX + ballRadius <= b.x;
+                    const hitFromRight = prevX - ballRadius >= b.x + blockWidth;
+                    const hitFromTop = prevY + ballRadius <= b.y;
+                    const hitFromBottom = prevY - ballRadius >= b.y + blockHeight;
+
+                    if (hitFromLeft || hitFromRight) {
+                        dx = -dx;
+                    } else if (hitFromTop || hitFromBottom) {
+                        dy = -dy;
+                    } else {
+                        // fallback: 둘 다 바꿔버리기 (엣지 케이스)
+                        dx = -dx;
+                        dy = -dy;
+                    }
+
+                    return; // 한 블럭만 충돌 처리
                 }
             }
         }
@@ -168,29 +195,39 @@ function draw() {
     drawScoreAndLives();
 
     collisionDetection();
+    //  바 충돌 조기 처리 (즉시 반응)
+    if (
+    y + dy > barPosY - ballRadius &&
+    x > barPosX &&
+    x < barPosX + barWidth &&
+    dy > 0
+    ) {
+    y = barPosY - ballRadius; // 공을 바 위로 올려줌
+    const hitPos = (x - (barPosX + barWidth / 2)) / (barWidth / 2);
+    const speed = Math.sqrt(dx * dx + dy * dy);
+    const angle = hitPos * (Math.PI / 3);
+
+    dx = speed * Math.sin(angle);
+    dy = -Math.abs(speed * Math.cos(angle));
+    }
 
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
     if (y + dy < ballRadius) dy = -dy;
     else if (y + dy > canvas.height - ballRadius) {
-        if (x > barPosX && x < barPosX + barWidth) dy = -dy;
-        else {
-            lives--;
-            if (!lives) {
-                alert("GAME OVER");
-                document.location.reload();
-            } else {
-                x = canvas.width / 2;
-                y = canvas.height - 30;
-                dx = 2;
-                dy = -2;
-                barPosX = (canvas.width - barWidth) / 2;
-            }
-        }
+    
+    lives--;
+    if (!lives) {
+        alert("GAME OVER");
+        document.location.reload();
+    } else {
+        x = canvas.width / 2;
+        y = canvas.height * 0.6;
+        dx = 0;
+        dy = 2;
     }
+}
 
-    if (rightPressed && barPosX < canvas.width - barWidth) barPosX += barMoveSpeed;
-    if (leftPressed && barPosX > 0) barPosX -= barMoveSpeed;
-
+ 
     x += dx;
     y += dy;
 
