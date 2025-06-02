@@ -11,7 +11,7 @@ let dx = 0;
 let dy = 2;
 const ballRadius = 10;
 
-// 바(패들)의 설정
+// 바(패들)의 설정sdajfkj
 const barWidth = 100;
 const barHeight = 20;
 let barPosX = (canvas.width - barWidth) / 2;
