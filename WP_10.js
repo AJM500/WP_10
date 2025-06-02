@@ -11,7 +11,7 @@ let dx = 0;
 let dy = 2;
 const ballRadius = 10;
 
-// 바(패들)의 설정sdajfkj
+// 바(패들)의 설정
 const barWidth = 100;
 const barHeight = 20;
 let barPosX = (canvas.width - barWidth) / 2;
@@ -87,11 +87,13 @@ canvas.addEventListener('mousemove', mouseMoveHandler);
 function mouseMoveHandler(e) {
     const rect = canvas.getBoundingClientRect();
     const relativeX = e.clientX - rect.left;
+    let nextBarPos = relativeX - barWidth / 2;
 
-    if (relativeX > 0 && relativeX < canvas.width) {
-        barPosX = relativeX - barWidth / 2;
-    }
+    if (nextBarPos < 0) nextBarPos = 0;
+    if (nextBarPos > canvas.width - barWidth) nextBarPos = canvas.width - barWidth;
+    barPosX = nextBarPos;
 }
+
 
 
 
@@ -157,25 +159,44 @@ function drawBar() {
 function drawBlocks() {
     for (let c = 0; c < blockColumnCount; c++) {
         for (let r = 0; r < blockRowCount; r++) {
-            if (blocks[c][r].status === 1) {
+            const block = blocks[c][r];
+            if (block.status === 1) {
                 const blockX = (c * (blockWidth + blockPadding)) + blockOffsetLeft;
                 const blockY = (r * (blockHeight + blockPadding)) + blockOffsetTop;
-                blocks[c][r].x = blockX;
-                blocks[c][r].y = blockY;
+                block.x = blockX;
+                block.y = blockY;
 
-                ctx.drawImage(blockImage, blockX, blockY, blockWidth, blockHeight);
+                // 블럭 색상 (체력별 구분)
+                if (block.hits === 3) {
+                    ctx.fillStyle = "#3b82f6"; // 진한 파랑
+                } else if (block.hits === 2) {
+                    ctx.fillStyle = "#60a5fa"; // 옅은 파랑
+                } else {
+                    ctx.fillStyle = "#f59e42"; // 주황
+                }
+                ctx.fillRect(blockX, blockY, blockWidth, blockHeight);
+
+                // 테두리 (옵션)
+                ctx.strokeStyle = "#222";
+                ctx.strokeRect(blockX, blockY, blockWidth, blockHeight);
+
+                // 체력 숫자 (옵션)
+                ctx.fillStyle = "#fff";
+                ctx.font = "16px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(block.hits, blockX + blockWidth / 2, blockY + blockHeight / 2);
             }
         }
     }
 }
-
 function drawScoreAndLives() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#000";
-    ctx.fillText("Score: " + score, canvas.width - 80, 20);
+    ctx.fillText("Score: " + score, canvas.width - 50, 20);
 
     // 현재 체력 숫자 표시 (나중에 이미지로 교체할 경우 아래 코드 사용)
-    ctx.fillText("Lives: " + lives, 10, 20);
+    ctx.fillText("Lives: " + lives, 40, 20);
 
     /* 이미지로 체력 표시하는 예시 코드 (나중에 이미지 사용 시 주석 해제)
     for(let i = 0; i < lives; i++) {
@@ -230,6 +251,23 @@ function draw() {
  
     x += dx;
     y += dy;
+     if (isAllBlocksCleared()) {
+        setTimeout(() => {
+            alert("STAGE CLEAR!");
+            document.location.reload();
+        }, 100);
+        return;
+    }
 
     requestAnimationFrame(draw);
+}
+function isAllBlocksCleared() {
+    for (let c = 0; c < blockColumnCount; c++) {
+        for (let r = 0; r < blockRowCount; r++) {
+            if (blocks[c][r].status === 1) {
+                return false; // 아직 남은 블럭이 있으면 false
+            }
+        }
+    }
+    return true; // 모두 제거됐을 때만 true
 }
