@@ -208,6 +208,9 @@ function drawScoreAndLives() {
 }
 
 function draw() {
+     if (isPaused) return; //일시정지관련
+
+     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBlocks();
@@ -271,3 +274,15 @@ function isAllBlocksCleared() {
     }
     return true; // 모두 제거됐을 때만 true
 }
+
+//일시정지 
+let isPaused = false;
+
+document.getElementById("pauseBtn").addEventListener("click", function () {
+    isPaused = !isPaused;
+    this.textContent = isPaused ? " 다시 시작" : " 일시정지";
+
+    if (!isPaused) {
+        requestAnimationFrame(draw); // 다시 시작
+    }
+});

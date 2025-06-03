@@ -1,3 +1,4 @@
+수정전 css
 /* WP_10.css */
 /*init*/
 *{
@@ -39,9 +40,38 @@ header{
 /* canvas style 세팅 */
 canvas {
     display: block;
-    margin: 150px auto;
     border: 2px solid #000;
     background-color: #ddd;
+    
+}
+#gameContainer {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    margin: 150px auto;
+}
+#gameCanvas {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
 }
 
-/* 추가 바람 */
+/* 일시정지버튼 */
+#pauseBtn {
+    position: absolute;
+    top: 40px; /* Score 아래로 내림 */
+    right: 8px; /* Score와 같은 x좌표 */
+    z-index: 2;
+    padding: 8px 14px;
+    font-size: 14px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+#pauseBtn:hover {
+    background-color: #333;
+}
