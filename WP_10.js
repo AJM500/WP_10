@@ -263,6 +263,11 @@ $("#settingBtn").on("click", function () {
     //이후 추가
 });
 
+// 메인 메뉴로 돌아감
+$("#mainMenu").on("click", function () {
+    window.location.href = "index.html";
+});
+
 function draw() {
      if (isPaused) return; //일시정지관련
 
