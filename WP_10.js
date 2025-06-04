@@ -8,15 +8,61 @@ const ctx = canvas.getContext("2d");
 let x = canvas.width / 2;
 let y = canvas.height * 0.4;
 let dx = 0;
-let dy = 5;
+let dy = 3;
 const ballRadius = 10;
+
+//블럭 객체
+class Block {
+    constructor(x, y, hits = 99) {
+        this.x = x;         // x좌표
+        this.y = y;         // y좌표
+        this.width = 32;    // 블럭 너비 (64로 맞춤)
+        this.height = 32;   // 블럭 높이
+        this.hits = hits;   // 블럭 체력(1~3)
+        this.status = 1;    // 살아있으면 1, 깨지면 0
+    }
+}
+// 자유 배치형 blocks 배열 (Block 인스턴스 리스트)
+// 자유 배치형 blocks 배열 (Block 인스턴스 리스트)
+// 체력(hits)은 원하는 값으로 넣어도 됨 (기본 3으로 지정)
+const blocks = [];
+// 위쪽 가로줄
+for (let x = 0; x <= 1024; x += 32) blocks.push(new Block(x, 0, 100));
+// 아래 가로줄
+blocks.push(new Block(32, 448, 100));
+blocks.push(new Block(64, 448, 100));
+blocks.push(new Block(96, 448, 100));
+blocks.push(new Block(872, 448, 100));
+blocks.push(new Block(904, 448, 100));
+blocks.push(new Block(936, 448, 100));
+// 왼쪽 세로줄
+for (let y = 32; y <= 470; y += 32) blocks.push(new Block(0, y, 100));
+// 오른쪽 세로줄
+for (let y = 32; y <= 470; y += 32) blocks.push(new Block(968, y, 100));
+// 내부 위쪽 가로줄
+for (let x = 160; x <= 800; x += 32) blocks.push(new Block(x, 64, 2));
+for (let x = 160; x <= 800; x += 96) blocks.push(new Block(x, 128, 2));
+
+// 내부 아래 가로줄
+for (let x = 608; x <= 768; x += 32) blocks.push(new Block(x, 384, 2));
+for (let x = 224; x <= 384; x += 32) blocks.push(new Block(x, 384, 2));
+// 내부 왼쪽 세로줄
+for (let y = 64; y <= 384; y += 32) blocks.push(new Block(160, y, 2));
+for (let y = 160; y <= 320; y += 32) blocks.push(new Block(300, y, 2));
+
+// 내부 오른쪽 세로줄
+for (let y = 64; y <= 384; y += 32) blocks.push(new Block(832, y, 2));
+for (let y = 160; y <= 320; y += 32) blocks.push(new Block(684, y, 2));
+
+
+
 
 //공 초기상태 초기화 함수
 function ball_init(){
     x = canvas.width / 2;
     y = canvas.height * 0.4;
     dx = 0;
-    dy = 5;
+    dy = 3;
 }
 
 // 바(패들)의 설정
@@ -30,27 +76,9 @@ let barMoveSpeed = 10;
 let lives = 5;
 let score = 0;
 
-// 블럭 설정
-const blockRowCount = 3;
-const blockColumnCount = 5;
-const blockWidth = barWidth;
-const blockHeight = barHeight;
-const blockPadding = 10;
-const blockOffsetTop = 50;
-const blockOffsetLeft = 30;
 
-// 블럭 배열 생성 및 초기화
-const blocks = [];
-for (let c = 0; c < blockColumnCount; c++) {
-    blocks[c] = [];
-    for (let r = 0; r < blockRowCount; r++) {
-        blocks[c][r] = {
-            x: 0, y: 0,
-            hits: r === 0 ? 3 : 1,
-            status: 1
-        };
-    }
-}
+
+
 
 const barImage = new Image();
 const blockImage = new Image();
@@ -107,46 +135,29 @@ function mouseMoveHandler(e) {
 
 
 function collisionDetection() {
-    for (let c = 0; c < blockColumnCount; c++) {
-        for (let r = 0; r < blockRowCount; r++) {
-            const b = blocks[c][r];
-            if (b.status === 1) {
-                // 충돌 여부 확인 (공 중심 + 반지름 고려)
-                const collided =
-                    x + ballRadius > b.x &&
-                    x - ballRadius < b.x + blockWidth &&
-                    y + ballRadius > b.y &&
-                    y - ballRadius < b.y + blockHeight;
+    for (let i = 0; i < blocks.length; i++) {
+        const b = blocks[i];
+        if (b.status === 1) {
+            // 충돌 여부 확인 (공 중심 + 반지름 고려)
+            const collided =
+                x + ballRadius > b.x &&
+                x - ballRadius < b.x + b.width &&
+                y + ballRadius > b.y &&
+                y - ballRadius < b.y + b.height;
 
-                if (collided) {
-                    // ✅ 블럭 체력 감소
-                    b.hits--;
-                    if (b.hits <= 0) {
-                        b.status = 0;
-                        score += 10;
-                    }
-
-                    // ✅ 충돌 방향 판별: 상하 vs 좌우
-                    const prevX = x - dx;
-                    const prevY = y - dy;
-
-                    const hitFromLeft = prevX + ballRadius <= b.x;
-                    const hitFromRight = prevX - ballRadius >= b.x + blockWidth;
-                    const hitFromTop = prevY + ballRadius <= b.y;
-                    const hitFromBottom = prevY - ballRadius >= b.y + blockHeight;
-
-                    if (hitFromLeft || hitFromRight) {
-                        dx = -dx;
-                    } else if (hitFromTop || hitFromBottom) {
-                        dy = -dy;
-                    } else {
-                        // fallback: 둘 다 바꿔버리기 (엣지 케이스)
-                        dx = -dx;
-                        dy = -dy;
-                    }
-
-                    return; // 한 블럭만 충돌 처리
+            if (collided) {
+                // 블럭 체력 감소
+                b.hits--;
+                if (b.hits <= 0) {
+                    b.status = 0;
+                    score += 10;
                 }
+
+                // 충돌 방향(간단처리)
+                dx = -dx;
+                dy = -dy;
+
+                return; // 한 번만 충돌 처리
             }
         }
     }
@@ -165,38 +176,25 @@ function drawBar() {
 }
 
 function drawBlocks() {
-    for (let c = 0; c < blockColumnCount; c++) {
-        for (let r = 0; r < blockRowCount; r++) {
-            const block = blocks[c][r];
-            if (block.status === 1) {
-                const blockX = (c * (blockWidth + blockPadding)) + blockOffsetLeft;
-                const blockY = (r * (blockHeight + blockPadding)) + blockOffsetTop;
-                block.x = blockX;
-                block.y = blockY;
+    blocks.forEach(block => {
+        if (block.status === 1) {
+            // 체력별 색상 구분 (3 이상: 검정, 3: 파랑, 2: 옅은파랑, 1: 주황)
+            ctx.fillStyle = block.hits >= 3 ? "#222" :
+                            block.hits === 2 ? "#60a5fa" : "#f59e42";
+            ctx.fillRect(block.x, block.y, block.width, block.height);
 
-                // 블럭 색상 (체력별 구분)
-                if (block.hits === 3) {
-                    ctx.fillStyle = "#3b82f6"; // 진한 파랑
-                } else if (block.hits === 2) {
-                    ctx.fillStyle = "#60a5fa"; // 옅은 파랑
-                } else {
-                    ctx.fillStyle = "#f59e42"; // 주황
-                }
-                ctx.fillRect(blockX, blockY, blockWidth, blockHeight);
+            // 테두리
+            ctx.strokeStyle = "#222";
+            ctx.strokeRect(block.x, block.y, block.width, block.height);
 
-                // 테두리 (옵션)
-                ctx.strokeStyle = "#222";
-                ctx.strokeRect(blockX, blockY, blockWidth, blockHeight);
-
-                // 체력 숫자 (옵션)
-                ctx.fillStyle = "#fff";
-                ctx.font = "16px Arial";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(block.hits, blockX + blockWidth / 2, blockY + blockHeight / 2);
-            }
+            // 체력 숫자 표시
+            ctx.fillStyle = "#fff";
+            ctx.font = "18px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(block.hits, block.x + block.width / 2, block.y + block.height / 2);
         }
-    }
+    });
 }
 function drawScoreAndLives() {
     ctx.font = "16px Arial";
@@ -323,12 +321,5 @@ function draw() {
     requestAnimationFrame(draw);
 }
 function isAllBlocksCleared() {
-    for (let c = 0; c < blockColumnCount; c++) {
-        for (let r = 0; r < blockRowCount; r++) {
-            if (blocks[c][r].status === 1) {
-                return false; // 아직 남은 블럭이 있으면 false
-            }
-        }
-    }
-    return true; // 모두 제거됐을 때만 true
+    return blocks.every(block => block.status === 0);
 }
