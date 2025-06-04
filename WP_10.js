@@ -6,10 +6,18 @@ const ctx = canvas.getContext("2d");
 
 // 공의 초기 위치와 이동 속도 설정
 let x = canvas.width / 2;
-let y = canvas.height * 0.6;
+let y = canvas.height * 0.4;
 let dx = 0;
-let dy = 2;
+let dy = 5;
 const ballRadius = 10;
+
+//공 초기상태 초기화 함수
+function ball_init(){
+    x = canvas.width / 2;
+    y = canvas.height * 0.4;
+    dx = 0;
+    dy = 5;
+}
 
 // 바(패들)의 설정
 const barWidth = 100;
@@ -193,19 +201,67 @@ function drawBlocks() {
 function drawScoreAndLives() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#000";
-    ctx.fillText("Score: " + score, canvas.width - 50, 20);
+    ctx.fillText("Score: " + score, canvas.width - 100, 28);
 
     // 현재 체력 숫자 표시 (나중에 이미지로 교체할 경우 아래 코드 사용)
-    ctx.fillText("Lives: " + lives, 40, 20);
+    //ctx.fillText("Lives: " + lives, 40, 20);
 
-    /* 이미지로 체력 표시하는 예시 코드 (나중에 이미지 사용 시 주석 해제)
+    /* 이미지로 체력 표시하는 예시 코드 (나중에 이미지 사용 시 주석 해제)*/
     for(let i = 0; i < lives; i++) {
         const lifeImage = new Image();
-        lifeImage.src = "path_to_life_image.png";
-        ctx.drawImage(lifeImage, 10 + (i * 30), 5, 20, 20);
+        lifeImage.src = "res/Health_Point.png";
+        ctx.drawImage(lifeImage, 12 + (i * 25), 12, 20, 20);
     }
-    */
 }
+
+let isPaused = false;
+
+// 오버레이 show/hide 함수
+function showPauseOverlay() {
+    $("#pauseOverlay").css("display", "flex");
+}
+function hidePauseOverlay() {
+    $("#pauseOverlay").hide();
+}
+
+function togglePause(triggeredByOverlay = false) {
+    isPaused = !isPaused;
+
+    if (isPaused) {
+        showPauseOverlay();
+    } else {
+        hidePauseOverlay();
+        requestAnimationFrame(draw);
+    }
+}
+
+$(".settings").on("click", function () {
+    togglePause();
+});
+
+$(document).on("keydown", function (e) {
+    if (isPaused && (e.key === "Escape" || e.key === "Esc")) {
+        togglePause(true);
+    }
+    else if(!isPaused && (e.key === "Escape" || e.key === "Esc")){
+        togglePause(false);
+    }
+});
+
+// 재개하기 버튼
+$("#resumeBtn").on("click", function () {
+    togglePause(true);
+});
+
+// 다시시작 버튼
+$("#restartBtn").on("click", function () {
+    location.reload();
+});
+
+// 설정 버튼
+$("#settingBtn").on("click", function () {
+    //이후 추가
+});
 
 function draw() {
      if (isPaused) return; //일시정지관련
@@ -244,10 +300,7 @@ function draw() {
         alert("GAME OVER");
         document.location.reload();
     } else {
-        x = canvas.width / 2;
-        y = canvas.height * 0.6;
-        dx = 0;
-        dy = 2;
+        ball_init();
     }
 }
 
@@ -274,15 +327,3 @@ function isAllBlocksCleared() {
     }
     return true; // 모두 제거됐을 때만 true
 }
-
-//일시정지 
-let isPaused = false;
-
-document.getElementById("pauseBtn").addEventListener("click", function () {
-    isPaused = !isPaused;
-    this.textContent = isPaused ? " 다시 시작" : " 일시정지";
-
-    if (!isPaused) {
-        requestAnimationFrame(draw); // 다시 시작
-    }
-});

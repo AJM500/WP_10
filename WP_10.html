@@ -12,13 +12,16 @@
     <script src="WP_10.js" defer></script>
 </head>
 <body>
-    <header id="header">
-        <div id="title">제목을 추가해주세요</div>
-    </header>
-
     <div id="gameContainer">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-        <button id="pauseBtn"> 일시정지</button>
+        <canvas id="gameCanvas" width="1000" height="600"></canvas>
+        <div class="settings"></div>
+        <div id="pauseOverlay" style="display: none;">
+            <div class="pause-modal">
+                <div id="resumeBtn">계속하기</div>
+                <div id="restartBtn">다시하기</div>
+                <div id="setting">세팅</div>
+            </div>        
+        </div>
     </div>
 </body>
 </html>
