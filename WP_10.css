@@ -23,12 +23,13 @@ a{
     position: absolute;
     top: 0;
     left: 0;
-    width: 1002px;
+    border: 2px solid black;
+    width: 1000px;
     height: 55px;
     display: flex;
     align-items: center;
     /* Top-bar 색조정 */
-    background: rgba(68, 68, 68, 0.9);
+    background: rgba(60, 60, 60, 0.9);
     z-index: 3;
     
 }
