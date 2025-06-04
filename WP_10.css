@@ -19,6 +19,35 @@ a{
 	text-decoration: none;
 }
 
+#topBar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1002px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    /* Top-bar 색조정 */
+    background: rgba(68, 68, 68, 0.9);
+    z-index: 3;
+    
+}
+
+.lives-container {
+    margin-left: 22px;
+    display: flex;
+    gap: 6px;
+}
+
+.score-container {
+    margin-left: 40px;
+    font-size: 22px;
+    font-family: 'Arial Black', Arial, sans-serif;
+    color: #333;
+    letter-spacing: 1.5px;
+    min-width: 120px;
+}
+
 /* canvas style 세팅 */
 canvas {
     display: block;
@@ -35,7 +64,7 @@ canvas {
 #gameCanvas {
     display: block;
     position: absolute;
-    top: 0;
+    top: 55px;
     left: 0;
     z-index: 1;
 }
@@ -64,8 +93,9 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
+    border: 2px solid black;
     width: 1000px;
-    height: 600px;
+    height: 655px;
     /* 배경 색깔을 해당 스테이지 속성 색깔로 변경 예정 */
     background: rgba(0,0,0,0.45);
     display: flex;

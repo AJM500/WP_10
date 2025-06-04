@@ -153,11 +153,31 @@ function collisionDetection() {
                     score += 10;
                 }
 
-                // 충돌 방향(간단처리)
-                dx = -dx;
-                dy = -dy;
+               // 충돌 방향 판별
+                const prevX = x - dx;
+                const prevY = y - dy;
+                let reversed = false;
+                if (prevY + ballRadius <= b.y) { // 위에서 충돌
+                    dy = -Math.abs(dy);
+                    reversed = true;
+                } else if (prevY - ballRadius >= b.y + b.height) { // 아래에서 충돌
+                    dy = Math.abs(dy);
+                    reversed = true;
+                }
+                if (prevX + ballRadius <= b.x) { // 왼쪽에서 충돌
+                    dx = -Math.abs(dx);
+                    reversed = true;
+                } else if (prevX - ballRadius >= b.x + b.width) { // 오른쪽에서 충돌
+                    dx = Math.abs(dx);
+                    reversed = true;
+                }
+                // 예외처리
+                if (!reversed) {
+                    dx = -dx;
+                    dy = -dy;
+                }
 
-                return; // 한 번만 충돌 처리
+                return;
             }
         }
     }
@@ -197,22 +217,24 @@ function drawBlocks() {
     });
 }
 function drawScoreAndLives() {
-    ctx.font = "16px Arial";
-    ctx.fillStyle = "#000";
-    ctx.fillText("Score: " + score, canvas.width - 100, 28);
-
-    // 현재 체력 숫자 표시 (나중에 이미지로 교체할 경우 아래 코드 사용)
-    //ctx.fillText("Lives: " + lives, 40, 20);
-
-    /* 이미지로 체력 표시하는 예시 코드 (나중에 이미지 사용 시 주석 해제)*/
-    for(let i = 0; i < lives; i++) {
-        const lifeImage = new Image();
-        lifeImage.src = "res/Health_Point.png";
-        ctx.drawImage(lifeImage, 12 + (i * 25), 12, 20, 20);
+    // 점수표시 : 상단바
+    document.querySelector(".score-container").textContent = "Score: " + score;
+    // HP 이미지 표시
+    const livesDiv = document.querySelector(".lives-container");
+    livesDiv.innerHTML = ""; // 초기화
+    for (let i = 0; i < lives; i++) {
+        const img = document.createElement("img");
+        img.src = "res/Health_Point.png";
+        img.width = 26;
+        img.height = 26;
+        img.alt = "체력";
+        livesDiv.appendChild(img);
     }
 }
 
 let isPaused = false;
+
+////////////////////////////설정관련 함수///////////////////////////////
 
 // 오버레이 show/hide 함수
 function showPauseOverlay() {
