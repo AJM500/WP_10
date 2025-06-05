@@ -209,11 +209,17 @@ function togglePause(triggeredByOverlay = false) {
     }
 }
 
+// 설정 버튼 누를 시 일시정지 후 오버레이
 $(".settings").on("click", function () {
     togglePause();
 });
 
 $(document).on("keydown", function (e) {
+    if (!settingsModal.classList.contains('hidden') && (e.key === "Escape" || e.key === "Esc")) {
+        settingsModal.classList.add('hidden');
+        pauseOverlay.style.display = 'flex';
+        return;
+    }
     if (isPaused && (e.key === "Escape" || e.key === "Esc")) {
         togglePause(true);
     }
@@ -232,15 +238,30 @@ $("#restartBtn").on("click", function () {
     location.reload();
 });
 
-// 설정 버튼
-$("#settingBtn").on("click", function () {
-    //이후 추가
-});
+
 
 // 메인 메뉴로 돌아감
 $("#mainMenu").on("click", function () {
     window.location.href = "index.html";
 });
+
+// 설정 모달 요소 가져오기
+const settingsModal = document.getElementById('settingsModal');
+const settingBtn = document.getElementById('setting');   // '세팅' 버튼
+const modalCloseBtn = document.querySelector('.modal-close');
+
+// 설정 버튼
+settingBtn.addEventListener('click', function () {
+    pauseOverlay.style.display = 'none'; // 오버레이 숨기고
+    settingsModal.classList.remove('hidden'); // 설정창 보이기
+});
+
+// 'X' 버튼 클릭 시 설정창 닫기
+modalCloseBtn.addEventListener('click', function () {
+    settingsModal.classList.add('hidden'); // 설정창 숨기고
+    pauseOverlay.style.display = 'flex';   // 오버레이 다시 보이기
+});
+
 
 function draw() {
      if (isPaused) return; //일시정지관련
