@@ -9,7 +9,7 @@ let x = canvas.width / 2;
 let y = canvas.height * 0.4;
 let dx = 0;
 let dy = 3;
-const ballRadius = 10;
+const ballRadius = 7;
 
 
 //공 초기상태 초기화 함수
