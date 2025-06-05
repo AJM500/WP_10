@@ -27,12 +27,11 @@ let barPosX = (canvas.width - barWidth) / 2;
 const barPosY = canvas.height - barHeight;
 let barMoveSpeed = 10;
 
-// 게임 상태 변수 설정
+
 let lives = 5;
 let score = 0;
 
-
-
+//여기에 세팅값에 따른 공 속도 및 스테이지 설정 추가
 
 
 const barImage = new Image();
@@ -179,7 +178,7 @@ function drawScoreAndLives() {
     livesDiv.innerHTML = ""; // 초기화
     for (let i = 0; i < lives; i++) {
         const img = document.createElement("img");
-        img.src = "res/Health_Point.png";
+        img.src = "res/gameImage/HP_ball.png";
         img.width = 26;
         img.height = 26;
         img.alt = "체력";
