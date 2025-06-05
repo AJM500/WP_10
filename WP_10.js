@@ -1,5 +1,9 @@
 // WP_10.js 완성본 (블럭 깨기 게임, 점수, 체력 상세 주석 구현 및 이미지 커스텀 지원)
 
+// 게임 시작 플래그 (window 객체 사용으로 전역 공유)
+if (typeof window.gameStarted === 'undefined') {
+    window.gameStarted = false;
+}
 // 캔버스 및 그리기 컨텍스트 설정
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -41,18 +45,23 @@ let imagesLoaded = 0;
 barImage.src = "https://placehold.co/100x20/orange/white";
 blockImage.src = "https://placehold.co/100x20/FF0000/FFFFFF";
 
-// 이미지 로딩 상태 확인 함수
+// 이미지 로딩 상태 확인 함수 - gameStarted 플래그 확인 추가
 function checkImagesLoaded() {
     imagesLoaded++;
-    if (imagesLoaded === 2) {
+    // temp_Stage.js에서 이미 게임이 시작되었는지 확인
+    if (imagesLoaded === 2 && !window.gameStarted) {
+        window.gameStarted = true;
         requestAnimationFrame(draw);
     }
 }
 
-// 이미지 로딩 실패 시에도 게임 시작
+// 이미지 로딩 실패 시에도 게임 시작 - gameStarted 플래그 확인 추가
 function handleImageError() {
     console.warn("이미지 로딩 실패, 기본 스타일로 진행합니다.");
-    requestAnimationFrame(draw);
+    if (!window.gameStarted) {
+        window.gameStarted = true;
+        requestAnimationFrame(draw);
+    }
 }
 
 // 이벤트 등록
@@ -64,8 +73,9 @@ blockImage.onerror = handleImageError;
 
 // 이미지 로딩 상태 확인 후 강제로 게임 시작하는 타이머 설정 (5초 후 무조건 실행)
 setTimeout(() => {
-    if (imagesLoaded < 2) {
+    if (imagesLoaded < 2 && !window.gameStarted) {
         console.warn("이미지 로딩 지연, 강제 게임 시작");
+        window.gameStarted = true;
         requestAnimationFrame(draw);
     }
 }, 5000);
@@ -99,13 +109,14 @@ function collisionDetection() {
                 y + ballRadius > b.y &&
                 y - ballRadius < b.y + b.height;
 
-            if (collided) {
-                // 블럭 체력 감소
-                b.hits--;
-                if (b.hits <= 0) {
-                    b.status = 0;
-                    score += 10;
-                }
+           if (collided) {
+             if (b.hits !== -1) {   // 체력이 -1이면 깎지마!
+             b.hits--;
+             if (b.hits <= 0) {
+                  b.status = 0;
+                 score += 10;
+                 }
+             }
 
                // 충돌 방향 판별
                 const prevX = x - dx;
@@ -150,23 +161,38 @@ function drawBar() {
 }
 
 function drawBlocks() {
-    blocks.forEach(block => {
+    blocks.forEach((block, index) => {
         if (block.status === 1) {
-            // 체력별 색상 구분 (3 이상: 검정, 3: 파랑, 2: 옅은파랑, 1: 주황)
-            ctx.fillStyle = block.hits >= 3 ? "#222" :
-                            block.hits === 2 ? "#60a5fa" : "#f59e42";
-            ctx.fillRect(block.x, block.y, block.width, block.height);
-
-            // 테두리
+            // 내부 블럭 (Grass): imgSet이 blockImgs
+            if (block.imgSet === blockImgs) {
+                // [★] hits(1~3)에 맞는 이미지를 매번 동적으로 고름!
+                let hitsToIdx = Math.max(0, Math.min(2, block.hits - 1)); // 0,1,2
+                const img = block.imgSet[hitsToIdx];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.drawImage(img, block.x, block.y, block.width, block.height);
+                } else {
+                    ctx.fillStyle = "#FF0000";
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+                }
+            }
+            // 외곽 블럭 (General): imgIdx를 고정적으로 사용
+            else if (block.imgSet === generalBlockImgs) {
+                const img = block.imgSet[block.imgIdx];
+                if (img && img.complete && img.naturalWidth > 0) {
+                    ctx.drawImage(img, block.x, block.y, block.width, block.height);
+                } else {
+                    ctx.fillStyle = "#222";
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+                }
+            }
+            // 테두리와 숫자 표시는 항상
             ctx.strokeStyle = "#222";
             ctx.strokeRect(block.x, block.y, block.width, block.height);
-
-            // 체력 숫자 표시
             ctx.fillStyle = "#fff";
             ctx.font = "18px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(block.hits, block.x + block.width / 2, block.y + block.height / 2);
+
         }
     });
 }
