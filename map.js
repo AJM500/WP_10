@@ -288,8 +288,8 @@ professorImage.onload = () =>{
 
   ctx.drawImage(  //느낌표 이미지 출력
     markImage,
-    professor.x - 5, professor.y - 33,
-    60, 50
+    professor.x + 5, professor.y - 15,
+    30, 25
     );
 };
 
@@ -297,8 +297,63 @@ professorImage.onload = () =>{
 playerImage.onload = () => {
   const frameWidth = playerImage.width / 3;
   const frameHeight = playerImage.height / 4;
-  player.width = frameWidth * 0.8;
-  player.height = frameHeight * 0.8;
+  player.width = frameWidth * 0.7;
+  player.height = frameHeight * 0.7;
   console.log("✅ player image loaded", frameWidth, frameHeight);
   requestAnimationFrame(gameLoop);
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  const hoverSound = document.getElementById('hoverSound');
+  const clickSound = document.getElementById('clickSound');
+  const settingsBtn = document.querySelector('.settings');
+  const closeButton = document.querySelector('.modal-close');
+  const modal = document.getElementById('settingsModal');
+  const sfxSlider = document.getElementById('sfxVolume');
+
+  // 설정된 값으로 볼륨 초기화
+  const savedSFX = localStorage.getItem('sfxVolume');
+
+  if (savedSFX) {
+    sfxSlider.value = savedSFX;
+    hoverSound.volume = parseFloat(savedSFX);
+    clickSound.volume = parseFloat(savedSFX);
+  }
+
+  //  슬라이더 조정 → 실시간 저장
+  sfxSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    hoverSound.volume = vol;
+    clickSound.volume = vol;
+    localStorage.setItem('sfxVolume', vol);
+  });
+
+
+  // 설정 버튼 hover/click 사운드 + 모달 열기
+  if (settingsBtn) {
+    settingsBtn.addEventListener('mouseenter', () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+    });
+
+    settingsBtn.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play();
+      modal.classList.remove('hidden');
+    });
+  }
+
+  // X 버튼 사운드 + 모달 닫기
+  if (closeButton) {
+    closeButton.addEventListener('mouseenter', () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+    });
+
+    closeButton.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play();
+      modal.classList.add('hidden');
+    });
+  }
+});

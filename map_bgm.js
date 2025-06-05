@@ -1,47 +1,54 @@
-let bgmPlayer;
-let bgmInterval;
+let bgmAudio = null;
 let hasStartedBGM = false;
 
-function onYouTubeIframeAPIReady() {
-  bgmPlayer = new YT.Player('player', {
-    height: '0',
-    width: '0',
-    videoId: 'RKDHuO4YBKo',
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      start: 0,
-      modestbranding: 1
-    },
-    events: {
-      onReady: (event) => event.target.setVolume(30),
-      onStateChange: (event) => {
-        if (event.data === YT.PlayerState.PLAYING && !bgmInterval) {
-          bgmInterval = setInterval(() => {
-            const currentTime = bgmPlayer.getCurrentTime();
-            if (currentTime >= 58) {
-              bgmPlayer.seekTo(0);
-            }
-          }, 1000);
-        }
-      }
-    }
+const mapType = document.body.dataset.map || "grass";
+
+const bgmConfig = {
+  grass: "res/sound/grassmap_bgm.mp3",
+  fire:  "res/sound/firemap_bgm.mp3",
+  water: "res/sound/watermap_bgm.mp3"
+};
+
+function setupBGM() {
+  const src = bgmConfig[mapType];
+  if (!src) {
+    console.warn(`[${mapType}] BGM not configured.`);
+    return;
+  }
+
+  bgmAudio = new Audio(src);
+  bgmAudio.loop = true;
+
+  const bgmSlider = document.getElementById('bgmVolume');
+  const savedVolume = localStorage.getItem('bgmVolume');
+  const volume = savedVolume !== null ? parseFloat(savedVolume) : 0.3;
+
+  bgmAudio.volume = volume;
+  if (bgmSlider) bgmSlider.value = volume;
+
+  bgmSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    if (bgmAudio) bgmAudio.volume = vol;
+    localStorage.setItem('bgmVolume', vol);
   });
+
+  console.log(`[${mapType}] BGM loaded: ${src}`);
 }
 
-document.addEventListener('keydown', () => {
-  if (!hasStartedBGM && bgmPlayer && bgmPlayer.playVideo) {
-    bgmPlayer.unMute();
-    bgmPlayer.playVideo();
+document.addEventListener("keydown", () => {
+  if (!hasStartedBGM && bgmAudio) {
+    bgmAudio.play().then(() => {
+      console.log(`[${mapType}] BGM started`);
+    }).catch((err) => {
+      console.error("BGM play error:", err);
+    });
     hasStartedBGM = true;
   }
 });
 
-function playSound() {
-  const clickSound = document.getElementById('clickSound');
-  if (clickSound) {
-    clickSound.currentTime = 0;
-    clickSound.play();
-  }
-}
+setupBGM();
+
+
+
+
 

@@ -58,3 +58,100 @@ body {
 .settings:hover {
   transform: rotate(30deg);
 }
+
+/* 설정 모달 */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+}
+
+/* 타이틀 + 닫기 X 아이콘 포함하는 헤더 */
+.modal-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.modal-header h2 {
+  text-align: center;
+  flex-grow: 1;
+  font-size: 18px;
+}
+
+.modal-close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  background-image: url('https://img.icons8.com/ios-glyphs/30/000000/macos-close.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-close:hover {
+  transform: scale(1.2);
+}
+
+.hidden {
+  display: none !important;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(to right, #00c3ff, #0077ff);
+  border-radius: 5px;
+  outline: none;
+  margin-top: 6px;
+  transition: background 0.3s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffcc00;
+  border: 2px solid #444;
+  cursor: pointer;
+  box-shadow: 0 0 3px #000;
+  transition: transform 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffcc00;
+  border: 2px solid #444;
+  cursor: pointer;
+}
