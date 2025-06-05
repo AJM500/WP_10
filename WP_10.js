@@ -245,21 +245,21 @@ $("#mainMenu").on("click", function () {
     window.location.href = "index.html";
 });
 
-// 설정 모달 요소 가져오기
+// 설정 Modal
 const settingsModal = document.getElementById('settingsModal');
-const settingBtn = document.getElementById('setting');   // '세팅' 버튼
+const settingBtn = document.getElementById('setting');  
 const modalCloseBtn = document.querySelector('.modal-close');
 
 // 설정 버튼
 settingBtn.addEventListener('click', function () {
-    pauseOverlay.style.display = 'none'; // 오버레이 숨기고
-    settingsModal.classList.remove('hidden'); // 설정창 보이기
+    pauseOverlay.style.display = 'none'; 
+    settingsModal.classList.remove('hidden'); 
 });
 
 // 'X' 버튼 클릭 시 설정창 닫기
 modalCloseBtn.addEventListener('click', function () {
-    settingsModal.classList.add('hidden'); // 설정창 숨기고
-    pauseOverlay.style.display = 'flex';   // 오버레이 다시 보이기
+    settingsModal.classList.add('hidden'); 
+    pauseOverlay.style.display = 'flex';   
 });
 
 
