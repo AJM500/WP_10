@@ -4,16 +4,34 @@
   <link rel="stylesheet" href="map.css">
   <script src="WatermapData.js"></script>
   <script src="Watermap.js" defer></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
-  <script src="Watermap_bgm.js" defer></script>
+  <script src="map_bgm.js" defer></script>
 </head>
-<body>
+<body data-map="water">
   <div class="map-container">
     <img src="res/Watermap.png" class="background-map">
     <canvas id="gameCanvas" width="1000" height="600" class="player-canvas"></canvas>
     <div class="settings"></div>
   </div>
 
+  <audio id="hoverSound" src="res/sound/gameStrat_hoverSound.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="res/sound/gameStart_clickSound.mp3" preload="auto"></audio>
+
   <div id="player"></div>
+  <!-- 설정 모달 -->
+  <div id="settingsModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>환경설정</h2>
+      <div class="modal-close" title="닫기"></div>
+    </div>
+
+    <label>효과음 볼륨:
+      <input type="range" id="sfxVolume" min="0" max="1" step="0.01" value="1">
+    </label>
+
+    <label>배경음악 볼륨:
+      <input type="range" id="bgmVolume" min="0" max="1" step="0.01" value="0.3">
+    </label>
+  </div>
 </body>
 </html>
