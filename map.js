@@ -65,7 +65,7 @@ const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
-$(document).on("keydown", e => {
+document.addEventListener("keydown", e => {
   if((e.key == "e") && isInteractable()){
     cancelAnimationFrame(player_loop);
 
@@ -73,15 +73,18 @@ $(document).on("keydown", e => {
     drawPlayer();
     drawProfessor();
     drawBox();
-    let click_sound = new Audio("res/sound/클릭.mp3");
-    click_sound.play();
+    
+    let click = new Audio("res/sound/클릭.mp3");
+    click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+    click.play();
   }
 
   if((e.key == 'e') && textbox.visible){
 
     if(textbox.index++ < textbox.text.length){
-      let click_sound = new Audio("res/sound/클릭.mp3");
-      click_sound.play();
+      let click = new Audio("res/sound/클릭.mp3");
+      click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+      click.play();
     }else{
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       drawPlayer();
@@ -219,14 +222,14 @@ function drawBox(){
 function pro_loop(){
   professor_loop = requestAnimationFrame(pro_loop);
   ctx.clearRect(professor.x, professor.y, professor.width, professor.height);
-  exit_Professor();
   drawProfessor();
+  exit_Professor();
 }
 
 function exit_Professor(){
   let moving = false;
 
-  if((professor.x < 870 && professor.y == 55) || (professor.x < 1000 && professor.y >= 70)) {
+  if((professor.x < 870 && professor.y == 55) || (professor.x < 904 && professor.y >= 70)) {
     professor.x += professor.speed; 
     professor.dir = 'right'; 
     moving = true;
@@ -237,6 +240,8 @@ function exit_Professor(){
     moving = true;
   }
   else {
+    mapData.blockedZones.pop();
+    ctx.clearRect(professor.x, professor.y, professor.width, professor.height);
     cancelAnimationFrame(professor_loop);
     requestAnimationFrame(gameLoop);
   }
