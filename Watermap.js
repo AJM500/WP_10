@@ -6,7 +6,8 @@ const directions = { down: 0, left: 1, right: 2, up: 3 };
 
 
 const playerImage = new Image();
-playerImage.src = "res/player_boy.png";  // ← 새 파일명
+const savedSprite = localStorage.getItem('playerSprite') || 'boy';
+playerImage.src = `res/player_${savedSprite}.png`;
 
 let player = {
   x: 600,
