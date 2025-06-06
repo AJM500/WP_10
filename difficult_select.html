@@ -126,6 +126,7 @@
         pokes.forEach(p => p.classList.remove('selected'));
         poke.classList.add('selected');
         selectedDiff = poke.id;
+        localStorage.setItem('selectedDifficulty', selectedDiff);
         confirmBtn.style.display = 'block';
       });
       poke.addEventListener('mouseenter', () => {
