@@ -9,6 +9,18 @@ const playerImage = new Image();
 const savedSprite = localStorage.getItem('playerSprite') || 'boy';
 playerImage.src = `res/player_${savedSprite}.png`;
 
+const professorImage = new Image();
+professorImage.src = "res/professor.png";
+
+const markImage = new Image();
+markImage.src = "res/mark.png";
+
+const textboxImage = new Image();
+textboxImage.src = "res/text.png";
+
+let player_loop;
+let professor_loop;
+
 let player = {
   x: 600,
   y: 560,
@@ -21,9 +33,64 @@ let player = {
   height: 46   // 기본값 (184 / 4)
 };
 
+let professor = {
+  x: 117,
+  y: 75,
+  frame: 1,
+  frameTick: 0,
+  frameMax: 10,
+  dir: 'down',
+  speed: 0.5,
+  width: 64,        // (192 / 3)
+  height: 64,
+  zone: undefined
+};
+
+let textbox = {
+  x: 150,
+  y: 400,
+  width: 700,
+  height: 200,
+
+  visible: false,
+  index: 0,
+  text: ["대사 1", "대사 2", "대사 4"]
+}
+
+
 const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
+document.addEventListener("keydown", e => {
+  if((e.key == "e") && isInteractable()){
+    cancelAnimationFrame(player_loop);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    drawProfessor();
+    drawBox();
+    
+    let click = new Audio("res/sound/클릭.mp3");
+    click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+    click.play();
+  }
+
+  if((e.key == 'e') && textbox.visible){
+
+    if(textbox.index++ < textbox.text.length){
+      let click = new Audio("res/sound/클릭.mp3");
+      click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+      click.play();
+    }else{
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPlayer();
+      drawProfessor();
+      requestAnimationFrame(pro_loop);
+      textbox.visible = false;
+    }
+  }
+
+});
 
 
 function isBlocked(x, y, width, height) {
@@ -40,6 +107,45 @@ function isBlocked(x, y, width, height) {
     hbY < zone.y + zone.h &&
     hbY + hbH > zone.y
   );
+}
+
+function isInteractable(){  //플레이어가 오박사를 보고있으면 true 반환
+  let x = player.x;
+  let y = player.y;
+  let width = player.width;
+  let height = player.height;
+  let zone = professor.zone;
+
+  switch(player.dir){
+  case 'up':
+    y -= player.speed;
+    break;
+  case 'down':
+    y += player.speed;
+    break;
+
+  case 'left':
+    x -= player.speed;
+    break;
+
+  case 'right':
+    x += player.speed;
+    break;
+  }
+
+
+  const hitboxPadding = 8;
+  const hbX = x + hitboxPadding;
+  const hbY = y + hitboxPadding;
+  const hbW = width - hitboxPadding * 2;
+  const hbH = height - hitboxPadding * 2;
+
+  return (
+    hbX < zone.x + zone.w &&
+    hbX + hbW > zone.x &&
+    hbY < zone.y + zone.h &&
+    hbY + hbH > zone.y
+    );
 }
 
 function movePlayer() {
@@ -84,10 +190,10 @@ function drawPlayer() {
 }
 
 function gameLoop() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(player.x, player.y, player.width, player.height);
   movePlayer();
   drawPlayer();
-  requestAnimationFrame(gameLoop);
+  player_loop = requestAnimationFrame(gameLoop);
 }
 
 playerImage.onload = () => {
@@ -98,6 +204,95 @@ player.height = frameHeight * 0.7;
   console.log("✅ player image loaded", frameWidth, frameHeight);
   requestAnimationFrame(gameLoop);
 };
+
+function drawBox(){
+  textbox.visible = true;
+
+  ctx.drawImage(
+    textboxImage,
+    textbox.x, textbox.y,
+    textbox.width, textbox.height
+    );
+
+
+  ctx.font = 'italic 38pt Arial';
+  ctx.fillText(textbox.text[textbox.index], textbox.x+100, textbox.y+100);
+}
+
+function drawProfessor(){
+  const directions = { down: 0, left: 1, right: 2, up: 3 };
+  const frameWidth = professorImage.width / 3;                 //이미지 파일 내에서 따올 너비
+  const frameHeight = professorImage.height / 4;               //높이
+  const sx = professor.frame * frameWidth;                     //이미지 파일 내의 x좌표
+  const sy = directions[professor.dir] * frameHeight;          //y
+
+  professor.width = frameWidth * 0.8;
+  professor.height = frameHeight * 0.8;
+
+  professor.zone.x = professor.x;
+  professor.zone.y = professor.y;
+
+
+  ctx.drawImage(
+    professorImage,
+    sx, sy, frameWidth, frameHeight,
+    professor.x, professor.y,
+    professor.width, professor.height
+    );
+}
+
+function exit_Professor(){
+  let moving = false;
+
+  if (professor.y >= 45) {
+    professor.y -= professor.speed; 
+    professor.dir = 'up'; 
+    moving = true;
+  }
+  else {
+    WatermapData.blockedZones.pop();
+    ctx.clearRect(professor.x, professor.y, professor.width, professor.height);
+    cancelAnimationFrame(professor_loop);
+    requestAnimationFrame(gameLoop);
+  }
+ 
+  if (moving) {
+    if (professor.frameTick++ > professor.frameMax) {
+      professor.frame = (professor.frame + 1) % 3;  // 3프레임
+      professor.frameTick = 0;
+    }
+  } else {
+    professor.frame = 1;
+    professor.frameTick = 0;
+  }
+}
+
+function pro_loop(){
+  professor_loop = requestAnimationFrame(pro_loop);
+  ctx.clearRect(professor.x, professor.y, professor.width, professor.height);
+  drawProfessor();
+  exit_Professor();
+}
+
+professorImage.onload = () =>{
+  WatermapData.blockedZones.push({
+    "x": professor.x,
+    "y": professor.y,
+    "w": professor.width,
+    "h": professor.height
+  });
+  professor.zone = WatermapData.blockedZones[WatermapData.blockedZones.length -1];
+
+  drawProfessor();
+
+
+  ctx.drawImage(  //느낌표 이미지 출력
+    markImage,
+    professor.x - 5, professor.y - 33,
+    60, 50
+    );
+};
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const hoverSound = document.getElementById('hoverSound');
