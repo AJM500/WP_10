@@ -8,12 +8,39 @@ if (typeof window.gameStarted === 'undefined') {
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+
+// 난이도 변수 불러오기
+const difficulty = localStorage.getItem('selectedDifficulty');
+let temp_diff;
+let diff_var;
+console.log("현재 난이도 : %s",difficulty);
+
+// 난이도 별 난이도 변수 설정
+switch(difficulty){
+    case "easy":
+        diff_var = 1;
+        break;
+    case "normal":
+        diff_var = 2;
+        break;
+    case "hard":
+        diff_var = 3;
+        break;
+    default:
+        temp_diff = "easy"
+        console.log("임시 난이도 : %s",temp_diff);
+        diff_var = 1;
+        break;
+}
+
 // 공의 초기 위치와 이동 속도 설정
 let x = canvas.width / 2;
 let y = canvas.height * 0.4;
 let dx = 0;
-let dy = 3;
+let dy = 0;
 const ballRadius = 7;
+let ballRotation = 0; // 공의 현재 회전 각도 (라디안)
+let ballRotationSpeed = 0; // 공의 회전 속도
 
 
 //공 초기상태 초기화 함수
@@ -21,8 +48,11 @@ function ball_init(){
     x = canvas.width / 2;
     y = canvas.height * 0.4;
     dx = 0;
-    dy = 3;
+    dy = diff_var*2;
+    ballRotation = 0; 
+    ballRotationSpeed = 0; 
 }
+ball_init();
 
 // 바(패들)의 설정
 const barWidth = 100;
@@ -148,9 +178,29 @@ function collisionDetection() {
     }
 }
 
+//회전 속도 함수
+function updateBallRotation() {
+    // dx가 양수면 시계방향, 음수면 반시계방향
+    const speed = Math.sqrt(dx * dx + dy * dy); // 공의 전체 속도
+    ballRotationSpeed = (dx / ballRadius) * 0.1; // 회전 속도는 수평 속도에 비례
+    
+    // 회전 각도 업데이트
+    ballRotation += ballRotationSpeed;
+    
+    // 360도(2π) 넘어가면 초기화 (성능 최적화)
+    if (ballRotation > Math.PI * 2) {
+        ballRotation -= Math.PI * 2;
+    } else if (ballRotation < -Math.PI * 2) {
+        ballRotation += Math.PI * 2;
+    }
+}
+
 function drawBall() {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ballRotation);
     if (window.ballImage && window.ballImage.complete && window.ballImage.naturalWidth > 0) {
-        ctx.drawImage(window.ballImage, x - ballRadius, y - ballRadius, ballRadius * 2, ballRadius * 2);
+        ctx.drawImage(window.ballImage, - ballRadius, - ballRadius, ballRadius * 2, ballRadius * 2);
     } else {
         ctx.beginPath();
         ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
@@ -158,6 +208,8 @@ function drawBall() {
         ctx.fill();
         ctx.closePath();
     }
+
+    ctx.restore();
 }
 
 function drawBar() {
@@ -305,6 +357,9 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBlocks();
+
+    updateBallRotation();
+
     drawBall();
     drawBar();
     drawScoreAndLives();
@@ -312,36 +367,43 @@ function draw() {
     collisionDetection();
     //  바 충돌 조기 처리 (즉시 반응)
     if (
-    y + dy > barPosY - ballRadius &&
-    x > barPosX &&
-    x < barPosX + barWidth &&
-    dy > 0
+        y + dy > barPosY - ballRadius &&
+        x > barPosX &&
+        x < barPosX + barWidth &&
+        dy > 0
     ) {
-    y = barPosY - ballRadius; // 공을 바 위로 올려줌
-    const hitPos = (x - (barPosX + barWidth / 2)) / (barWidth / 2);
-    const speed = Math.sqrt(dx * dx + dy * dy);
-    const angle = hitPos * (Math.PI / 3);
+        y = barPosY - ballRadius; // 공을 바 위로 올려줌
+        const hitPos = (x - (barPosX + barWidth / 2)) / (barWidth / 2);
+        const speed = Math.sqrt(dx * dx + dy * dy);
+        const angle = hitPos * (Math.PI / 3);
 
-    dx = speed * Math.sin(angle);
-    dy = -Math.abs(speed * Math.cos(angle));
+        dx = speed * Math.sin(angle);
+        dy = -Math.abs(speed * Math.cos(angle));
+
+        ballRotationSpeed += hitPos * 0.2;
     }
 
-    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) dx = -dx;
-    if (y + dy < ballRadius) dy = -dy;
+    if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+        ballRotationSpeed *= -0.8;
+    }
+    if (y + dy < ballRadius) {
+        dy = -dy;
+        ballRotationSpeed *= 0.9;
+    }
     else if (y + dy > canvas.height - ballRadius) {
-    
-    lives--;
-    if (!lives) {
-        alert("GAME OVER");
-        document.location.reload();
-    } else {
-        ball_init();
+        lives--;
+        if (!lives) {
+            alert("GAME OVER");
+            document.location.reload();
+        } else {
+            ball_init();
     }
-}
+    }
 
- 
     x += dx;
     y += dy;
+    
      if (isAllBlocksCleared()) {
         setTimeout(() => {
             alert("STAGE CLEAR!");
