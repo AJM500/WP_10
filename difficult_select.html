@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>난이도 선택</title>
+  <link rel="stylesheet" href="select.css">
+  <script src="select.js" defer></script>
+  <style>
+    .poke-box {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 80px;
+      margin: 30px 0;
+    }
+    .poke {
+      transition: transform 0.3s, filter 0.3s;
+      cursor: pointer;
+      border-radius: 16px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .poke img {
+      display: block;
+    }
+    .poke#easy img {
+      height: 110px;
+      margin-bottom: 10px;
+    }
+    .poke#normal img {
+      height: 160px;
+    }
+    .poke#hard img {
+      height: 230px;
+    }
+    .difficulty-label {
+      margin-top: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      text-shadow: 1px 1px #fff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .poke.selected .difficulty-label {
+      opacity: 1;
+    }
+    .poke.selected {
+      transform: scale(1.12);
+      filter: drop-shadow(0 0 15px #ff6600);
+    }
+    #confirmBtn {
+      display: none;
+      margin-top: 20px;
+    }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+      text-shadow: 1px 1px #fff;
+    }
+    body {
+      background: white;
+    }
+    .background-box {
+      background: linear-gradient(to bottom, #C6F1FF, #E7FFEA);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-box">
+    <div class="settings" onclick="playSound()"></div>
+    <h2>난이도를 선택하세요</h2>
+    <div class="poke-box">
+      <div class="poke" id="easy">
+        <img src="res/komongul.png" alt="쉬움">
+        <div class="difficulty-label">쉬움 - 풀타입 포켓몬</div>
+      </div>
+      <div class="poke" id="normal">
+        <img src="res/yadoran.png" alt="보통">
+        <div class="difficulty-label">보통 - 물타입 포켓몬</div>
+      </div>
+      <div class="poke" id="hard">
+        <img src="res/boxta.png" alt="어려움">
+        <div class="difficulty-label">어려움 - 불타입 포켓몬</div>
+      </div>
+    </div>
+
+    <button class="btn" id="confirmBtn" onclick="confirmDifficulty()">확인</button>
+
+    <audio id="hoverSound" src="res/sound/gameStrat_hoverSound.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="res/sound/gameStart_clickSound.mp3" preload="auto"></audio>
+    <audio id="bgmAudio" src="res/sound/select.mp3" loop preload="auto"></audio>
+  </div>
+
+  <!-- 설정 모달 -->
+  <div id="settingsModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>환경설정</h2>
+        <div class="modal-close" title="닫기"></div>
+      </div>
+      <label>효과음 볼륨:
+        <input type="range" id="sfxVolume" min="0" max="1" step="0.01" value="1">
+      </label>
+      <label>배경음악 볼륨:
+        <input type="range" id="bgmVolume" min="0" max="1" step="0.01" value="0.3">
+      </label>
+    </div>
+  </div>
+
+  <script>
+    let selectedDiff = null;
+    const pokes = document.querySelectorAll('.poke');
+    const confirmBtn = document.getElementById('confirmBtn');
+
+    pokes.forEach(poke => {
+      poke.addEventListener('click', () => {
+        pokes.forEach(p => p.classList.remove('selected'));
+        poke.classList.add('selected');
+        selectedDiff = poke.id;
+        confirmBtn.style.display = 'block';
+      });
+      poke.addEventListener('mouseenter', () => {
+        hoverSound.currentTime = 0;
+        hoverSound.play();
+      });
+    });
+
+    function confirmDifficulty() {
+      clickSound.play();
+      if (selectedDiff === 'easy') window.location.href = 'map.html';
+      else if (selectedDiff === 'normal') window.location.href = 'Watermap.html';
+      else if (selectedDiff === 'hard') window.location.href = 'Firemap.html';
+    }
+  </script>
+</body>
+</html>

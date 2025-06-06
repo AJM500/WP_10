@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>캐릭터 선택</title>
+  <link rel="stylesheet" href="select.css">
+  <script src="select.js" defer></script>
+ 
+</head>
+<body>
+  <div class="background-box">
+    <div class="settings" onclick="playSound()"></div>
+    <h2>캐릭터를 선택하세요</h2>
+    <div class="char-box">
+      <img src="res/boy.png" class="char" id="boy" alt="boy">
+      <img src="res/girl.png" class="char" id="girl" alt="girl">
+    </div>
+
+    <div class="textbox" id="nameBox">
+      <input type="text" id="playerNameInput" placeholder="플레이어 이름 입력">
+    </div>
+
+    <button class="btn" onclick="confirmSelection()">확인</button>
+
+  <audio id="hoverSound" src="res/sound/gameStrat_hoverSound.mp3" preload="auto"></audio>
+  <audio id="clickSound" src="res/sound/gameStart_clickSound.mp3" preload="auto"></audio>
+  <audio id="bgmAudio" src="res/sound/select.mp3" loop preload="auto"></audio>
+  </div>
+  <!-- 설정 모달 -->
+  <div id="settingsModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>환경설정</h2>
+      <div class="modal-close" title="닫기"></div>
+    </div>
+
+    <label>효과음 볼륨:
+      <input type="range" id="sfxVolume" min="0" max="1" step="0.01" value="1">
+    </label>
+
+    <label>배경음악 볼륨:
+      <input type="range" id="bgmVolume" min="0" max="1" step="0.01" value="0.3">
+    </label>
+  </div>
+
+</body>
+</html>
