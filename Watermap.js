@@ -18,6 +18,15 @@ markImage.src = "res/mark.png";
 const textboxImage = new Image();
 textboxImage.src = "res/text.png";
 
+//포켓몬 위치
+const pokemonSpot = {
+  x: 746,
+  y: 470,
+  width: 40,
+  height: 40,
+  triggered: false
+};
+
 let player_loop;
 let professor_loop;
 
@@ -46,17 +55,25 @@ let professor = {
   zone: undefined
 };
 
+const playerName = localStorage.getItem('playerName') || "플레이어";
+
 let textbox = {
   x: 150,
   y: 400,
   width: 700,
   height: 200,
-
   visible: false,
   index: 0,
-  text: ["대사 1", "대사 2", "대사 4"]
-}
-
+  text: [
+    `${playerName}야(아), 기다리고 있었단다`,
+    `이곳은 물타입 포켓몬이 풍부한 도시란다.`,
+    `이곳의 트레이너들은 물타입 포켓몬을 주로 파트너로 둔다고 하지.`,
+    `너가 잃어버린 풀타입 포켓몬이 이 도시 어딘가에 있을 거란다.`,
+    '저번 도시와 마찬가지로',
+    `포켓몬을 찾는다면 이 도시에서의 포켓몬 배틀에 큰 도움이 되겠지.`,
+    `이 도시의 챔피언이 되고 싶다면 파란색 건물을 먼저 찾아가보려무나.`
+  ]
+};
 
 const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
@@ -163,6 +180,21 @@ function movePlayer() {
     player.y = nextY;
   }
 
+  //포켓몬 획득
+  if (
+    !pokemonSpot.triggered &&
+    !textbox.visible &&  // ✅ 대화창이 닫힌 상태
+    textbox.index >= textbox.text.length && // ✅ 대사 전부 끝난 상태
+    player.x < pokemonSpot.x + pokemonSpot.width &&
+    player.x + player.width > pokemonSpot.x &&
+    player.y < pokemonSpot.y + pokemonSpot.height &&
+    player.y + player.height > pokemonSpot.y
+  ) {
+    pokemonSpot.triggered = true;
+    triggerPokemonCutscene();
+    return;
+  }
+
   if (moving) {
     if (player.frameTick++ > player.frameMax) {
       player.frame = (player.frame + 1) % 3;  // 3프레임
@@ -172,6 +204,7 @@ function movePlayer() {
     player.frame = 1;
     player.frameTick = 0;
   }
+  console.log(`Player position - x: ${player.x}, y: ${player.y}`);
 }
 
 function drawPlayer() {
@@ -215,7 +248,7 @@ function drawBox(){
     );
 
 
-  ctx.font = 'italic 38pt Arial';
+  ctx.font = 'italic 13.5pt Arial';
   ctx.fillText(textbox.text[textbox.index], textbox.x+100, textbox.y+100);
 }
 
@@ -288,8 +321,8 @@ professorImage.onload = () =>{
 
   ctx.drawImage(  //느낌표 이미지 출력
     markImage,
-    professor.x - 5, professor.y - 33,
-    60, 50
+    professor.x + 7, professor.y - 15,
+    30, 25
     );
 };
 
@@ -348,3 +381,109 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+//포켓몬 컷신
+function triggerPokemonCutscene() {
+  if (player_loop !== null) {
+    cancelAnimationFrame(player_loop);
+    player_loop = null;
+  }
+
+  // 기존 BGM 일시정지
+  if (typeof bgmAudio !== "undefined" && bgmAudio && !bgmAudio.paused) {
+    bgmAudio.pause();
+  }
+
+  // 컷신 전용 BGM 재생 
+  const specialBGM = new Audio("res/sound/catch_theme.mp3"); // 
+  specialBGM.volume = parseFloat(localStorage.getItem("bgmVolume") || 0.3);
+  specialBGM.play();
+
+  const mapContainer = document.querySelector('.map-container');
+
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    background: 'radial-gradient(circle at center, #b8f0f0, #226666)',
+    zIndex: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '30px'
+  });
+
+  const img = document.createElement('img');
+  img.src = 'res/shabi.png';
+  Object.assign(img.style, {
+    width: '200px',
+    marginBottom: '80px'
+  });
+
+  const speechBoxWrapper = document.createElement('div');
+  Object.assign(speechBoxWrapper.style, {
+    position: 'relative',
+    width: '700px',
+    height: '200px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  });
+
+  const speechBox = document.createElement('img');
+  speechBox.src = 'res/text.png';
+  Object.assign(speechBox.style, {
+    width: '700px',
+    height: '200px',
+    position: 'absolute',
+    top: 0,
+    left: 0
+  });
+
+  const message = document.createElement('div');
+  message.innerHTML = '포켓몬을 찾았다!<br><span style="font-size:18px">▼</span>';
+  Object.assign(message.style, {
+    position: 'relative',
+    zIndex: 1,
+    fontSize: '20px',
+    fontFamily: 'Arial',
+    fontWeight: 'bold',
+    color: '#000',
+    textAlign: 'center',
+    lineHeight: '1.5'
+  });
+
+  speechBoxWrapper.appendChild(speechBox);
+  speechBoxWrapper.appendChild(message);
+  overlay.appendChild(img);
+  overlay.appendChild(speechBoxWrapper);
+  mapContainer.appendChild(overlay);
+
+  const handleKeydown = (e) => {
+    if (e.key.toLowerCase() === 'e') {
+      const click = new Audio("res/sound/클릭.mp3");
+      click.volume = parseFloat(localStorage.getItem("sfxVolume") || 1);
+      click.play();
+
+      //  풀속성 포켓몬 획득 여부 저장
+      localStorage.setItem("grasspocketmon", "true");
+
+      overlay.remove();
+      document.removeEventListener('keydown', handleKeydown);
+
+      //  BGM 다시 재생
+      if (typeof bgmAudio !== "undefined" && bgmAudio && bgmAudio.paused) {
+        bgmAudio.play();
+      }
+
+      if (player_loop !== null) cancelAnimationFrame(player_loop);
+      player_loop = requestAnimationFrame(gameLoop);
+    }
+  };
+
+  document.addEventListener('keydown', handleKeydown);
+}
