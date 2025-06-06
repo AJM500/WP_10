@@ -1,3 +1,8 @@
+//볼,바 이미지 선언
+window.barImage = new Image();
+window.barImage.src = "res/gameImage/Grass_bar.png";
+window.ballImage = new Image();
+window.ballImage.src = "res/gameImage/Grass_ball.png";
 //외곽 블럭 이미지셋 선언
 const generalBlockImgs = [
     new Image(),

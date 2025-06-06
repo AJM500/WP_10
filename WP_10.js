@@ -38,11 +38,11 @@ let score = 0;
 //여기에 세팅값에 따른 공 속도 및 스테이지 설정 추가
 
 
-const barImage = new Image();
+
 const blockImage = new Image();
 let imagesLoaded = 0;
 
-barImage.src = "https://placehold.co/100x20/orange/white";
+
 blockImage.src = "https://placehold.co/100x20/FF0000/FFFFFF";
 
 // 이미지 로딩 상태 확인 함수 - gameStarted 플래그 확인 추가
@@ -149,15 +149,24 @@ function collisionDetection() {
 }
 
 function drawBall() {
-    ctx.beginPath();
-    ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
-    ctx.fillStyle = "#FF0000";
-    ctx.fill();
-    ctx.closePath();
+    if (window.ballImage && window.ballImage.complete && window.ballImage.naturalWidth > 0) {
+        ctx.drawImage(window.ballImage, x - ballRadius, y - ballRadius, ballRadius * 2, ballRadius * 2);
+    } else {
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = "#FF0000";
+        ctx.fill();
+        ctx.closePath();
+    }
 }
 
 function drawBar() {
-    ctx.drawImage(barImage, barPosX, barPosY, barWidth, barHeight);
+    if (window.barImage && window.barImage.complete && window.barImage.naturalWidth > 0) {
+        ctx.drawImage(window.barImage, barPosX, barPosY, barWidth, barHeight);
+    } else {
+        ctx.fillStyle = "#ffa500";
+        ctx.fillRect(barPosX, barPosY, barWidth, barHeight);
+    }
 }
 
 function drawBlocks() {
