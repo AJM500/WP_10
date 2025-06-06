@@ -34,7 +34,7 @@ blockImgs.forEach(img => {
         if (blockImgsLoaded === blockImgs.length && !window.gameStarted) {
             // 게임이 아직 시작되지 않았을 때만 draw() 시작
             window.gameStarted = true;
-            requestAnimationFrame(draw);
+            //requestAnimationFrame(draw);
         }
     };
     img.onerror = () => {
