@@ -113,5 +113,58 @@ for (let y =150 ; y <= 350; y += 25) {
     blocks.push(new Block(750, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 }
 
+// window 객체에 할당
+window.blocks = blocks;
+window.blockImgs = blockImgs;
+window.generalBlockImgs = generalBlockImgs;
 
+// 모든 이미지 로딩 완료 체크 및 게임 시작 신호
+let totalImages = blockImgs.length + generalBlockImgs.length + 2;
+let loadedImages = 0;
+
+function checkAllImagesLoaded() {
+    loadedImages++;
+    
+    if (loadedImages === totalImages) {
+        window.stageReady = true;
+        
+        if (window.onStageReady) {
+            window.onStageReady();
+        }
+    }
+}
+
+// 모든 이미지에 로딩 이벤트 추가
+blockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = checkAllImagesLoaded;
+    }
+});
+
+generalBlockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = checkAllImagesLoaded;
+    }
+});
+
+// 바와 공 이미지 체크
+if (window.barImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.barImage.onload = checkAllImagesLoaded;
+    window.barImage.onerror = checkAllImagesLoaded;
+}
+
+if (window.ballImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.ballImage.onload = checkAllImagesLoaded;
+    window.ballImage.onerror = checkAllImagesLoaded;
+}
 
