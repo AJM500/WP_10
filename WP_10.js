@@ -118,8 +118,13 @@ function mouseMoveHandler(e) {
     const relativeX = e.clientX - rect.left;
     let nextBarPos = relativeX - barWidth / 2;
 
-    if (nextBarPos < 0) nextBarPos = 0;
-    if (nextBarPos > canvas.width - barWidth) nextBarPos = canvas.width - barWidth;
+    // 바 이동 제한: 외곽 블럭 기준으로 한정
+    const leftLimit = 40;
+    const rightLimit = canvas.width - 40 - barWidth;
+
+    if (nextBarPos < leftLimit) nextBarPos = leftLimit;
+    if (nextBarPos > rightLimit) nextBarPos = rightLimit;
+
     barPosX = nextBarPos;
 }
 
