@@ -10,9 +10,32 @@
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!--  <script src="setting.js"></script>  -->
-    <script src="temp_Stage.js"></script>
-    <script src="WP_10.js" defer></script>
+
+    
+
+    <script>
+        window.onload = function () {
+            const nextJs = localStorage.getItem('nextStage') || 'stage_00.js';
+            const script = document.createElement('script');
+            script.src = nextJs;
+            script.onload = function(){
+                // 스테이지 로딩 완료 후 WP_10.js 로딩
+                const mainScript = document.createElement('script');
+                mainScript.src = "WP_10.js";
+                mainScript.onload = function(){
+                    if(typeof resetGameState === 'function'){
+                        resetGameState();
+                    } else {
+                        console.error('resetGameState가 정의되지 않음');
+                    }
+                };
+                document.body.appendChild(mainScript);
+            };
+            document.body.appendChild(script);
+        };
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <div id="gameContainer">
