@@ -87,3 +87,75 @@ for(let x = 660; x <= 780; x += 40)
 for(let x = 300; x <= 620; x += 80)
     blocks.push(new Block(x, 310, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
+// 여기 이하 코드 복붙(타이밍 이슈 해결용)
+// 먼저 window 객체에 할당
+window.blocks = blocks;
+window.blockImgs = blockImgs;
+window.generalBlockImgs = generalBlockImgs;
+
+// 모든 이미지 로딩 완료 체크 및 게임 시작 신호
+let totalImages = blockImgs.length + generalBlockImgs.length + 2; // +2 for bar and ball
+let loadedImages = 0;
+
+function checkAllImagesLoaded() {
+    loadedImages++;
+    console.log(`이미지 로딩: ${loadedImages}/${totalImages}`);
+    
+    if (loadedImages === totalImages) {
+        console.log("모든 이미지 로딩 완료!");
+        window.stageReady = true;
+        
+        // 게임 메인 스크립트에 로딩 완료 신호 전송
+        if (window.onStageReady) {
+            window.onStageReady();
+        }
+    }
+}
+
+// 모든 이미지에 로딩 이벤트 추가
+blockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = () => {
+            console.error("블럭 이미지 로딩 실패", img.src);
+            checkAllImagesLoaded(); // 실패해도 카운트
+        };
+    }
+});
+
+generalBlockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = () => {
+            console.error("일반 블럭 이미지 로딩 실패", img.src);
+            checkAllImagesLoaded(); // 실패해도 카운트
+        };
+    }
+});
+
+// 바와 공 이미지 체크
+if (window.barImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.barImage.onload = checkAllImagesLoaded;
+    window.barImage.onerror = () => {
+        console.error("바 이미지 로딩 실패");
+        checkAllImagesLoaded();
+    };
+}
+
+if (window.ballImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.ballImage.onload = checkAllImagesLoaded;
+    window.ballImage.onerror = () => {
+        console.error("공 이미지 로딩 실패");
+        checkAllImagesLoaded();
+    };
+}
+
+console.log("Stage 1 스크립트 로딩 완료");
