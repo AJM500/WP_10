@@ -10,6 +10,7 @@
     <!-- JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!--  <script src="setting.js"></script>  -->
+
     
 
     <script>
@@ -33,6 +34,8 @@
             document.body.appendChild(script);
         };
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <div id="gameContainer">
@@ -67,6 +70,25 @@
                 </label>
             </div>
         </div>
+
+        <!--게임 오버-->
+        <div id="gameOverOverlay" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>전투불가!</h2>
+                </div>
+                <img id="faintedTrainer" src="res/defeat.png" alt="패배">
+                <div id="retryBtn" class="modal-button">재도전</div>
+                <div id="homeBtn" class="modal-button">홈으로</div>
+            </div>
+        </div>
+
+
+        <!--효과음 및 배경음-->
+        <audio id="hoverSound" src="res/sound/gameStrat_hoverSound.mp3" preload="auto"></audio>
+        <audio id="clickSound" src="res/sound/gameStart_clickSound.mp3" preload="auto"></audio>
+        <audio id="bgmAudio"></audio>
+
     </div>
 </body>
 </html>
