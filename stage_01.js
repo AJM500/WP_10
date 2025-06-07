@@ -3,6 +3,7 @@ window.barImage = new Image();
 window.barImage.src = "res/gameImage/Grass_bar.png";
 window.ballImage = new Image();
 window.ballImage.src = "res/gameImage/Grass_ball.png";
+
 //외곽 블럭 이미지셋 선언
 const generalBlockImgs = [
     new Image(),
@@ -22,25 +23,12 @@ const blockImgs = [
 blockImgs[0].src = "res/gameImage/Grass_block1_32.png";
 blockImgs[1].src = "res/gameImage/Grass_block2_32.png";
 blockImgs[2].src = "res/gameImage/Grass_block3_32.png";
+
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
 }
-//이미지 불러오기전 draw실행 방지
-let blockImgsLoaded = 0;
-blockImgs.forEach(img => {
-    img.onload = () => {
-        blockImgsLoaded++;
-        if (blockImgsLoaded === blockImgs.length && !window.gameStarted) {
-            // 게임이 아직 시작되지 않았을 때만 draw() 시작
-            window.gameStarted = true;
-            //requestAnimationFrame(draw);
-        }
-    };
-    img.onerror = () => {
-        console.error("블럭 이미지 로딩 실패", img.src);
-    };
-});
+
 //블럭 객체
 class Block {
     constructor(x, y, hits = 99,imgIdx = null, type="grass", imgSet = blockImgs) {
@@ -56,22 +44,20 @@ class Block {
     }
 }
 
-
 const blocks = [];
 
 // === [1] 외곽 블럭 (상단만) ===
 for (let x = 0; x <= 960; x += 40) {
-    blocks.push(new Block(x, 0, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));      // 상단만!
+    blocks.push(new Block(x, 0, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 }
 
 // === [2] 외곽 블럭 (좌/우측) ===
 for (let y = 40; y < 600; y += 40) {
-    blocks.push(new Block(0, y, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));      // 좌측
-    blocks.push(new Block(960, y, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));    // 우측
+    blocks.push(new Block(0, y, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
+    blocks.push(new Block(960, y, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 }
 
 // === [3] 내부블럭 ===
-
 for (let x = 180; x <= 350; x += 40)
     blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 440; x <= 560; x += 40)
@@ -79,15 +65,88 @@ for (let x = 440; x <= 560; x += 40)
 for (let x = 650; x <= 820; x += 40)
     blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
-
 for (let x = 80; x <= 350; x += 40)
     blocks.push(new Block(x, 300, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 660; x <= 930; x += 40)
     blocks.push(new Block(x, 300, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
-
 
 for (let x = 300; x <= 420; x += 40)
     blocks.push(new Block(x, 400, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 for (let x = 520; x <= 640; x += 40)
     blocks.push(new Block(x, 400, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+
+
+
+// 여기 이하 코드 복붙(타이밍 이슈 해결용)
+// 먼저 window 객체에 할당
+window.blocks = blocks;
+window.blockImgs = blockImgs;
+window.generalBlockImgs = generalBlockImgs;
+
+// 모든 이미지 로딩 완료 체크 및 게임 시작 신호
+let totalImages = blockImgs.length + generalBlockImgs.length + 2; // +2 for bar and ball
+let loadedImages = 0;
+
+function checkAllImagesLoaded() {
+    loadedImages++;
+    console.log(`이미지 로딩: ${loadedImages}/${totalImages}`);
+    
+    if (loadedImages === totalImages) {
+        console.log("모든 이미지 로딩 완료!");
+        window.stageReady = true;
+        
+        // 게임 메인 스크립트에 로딩 완료 신호 전송
+        if (window.onStageReady) {
+            window.onStageReady();
+        }
+    }
+}
+
+// 모든 이미지에 로딩 이벤트 추가
+blockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = () => {
+            console.error("블럭 이미지 로딩 실패", img.src);
+            checkAllImagesLoaded(); // 실패해도 카운트
+        };
+    }
+});
+
+generalBlockImgs.forEach(img => {
+    if (img.complete) {
+        checkAllImagesLoaded();
+    } else {
+        img.onload = checkAllImagesLoaded;
+        img.onerror = () => {
+            console.error("일반 블럭 이미지 로딩 실패", img.src);
+            checkAllImagesLoaded(); // 실패해도 카운트
+        };
+    }
+});
+
+// 바와 공 이미지 체크
+if (window.barImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.barImage.onload = checkAllImagesLoaded;
+    window.barImage.onerror = () => {
+        console.error("바 이미지 로딩 실패");
+        checkAllImagesLoaded();
+    };
+}
+
+if (window.ballImage.complete) {
+    checkAllImagesLoaded();
+} else {
+    window.ballImage.onload = checkAllImagesLoaded;
+    window.ballImage.onerror = () => {
+        console.error("공 이미지 로딩 실패");
+        checkAllImagesLoaded();
+    };
+}
+
+console.log("Stage 1 스크립트 로딩 완료");

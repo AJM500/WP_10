@@ -1,19 +1,19 @@
-// WP_10.js 완성본 (블럭 깨기 게임, 점수, 체력 상세 주석 구현 및 이미지 커스텀 지원)
+// WP_10.js 개선 버전 - 설정 버튼 문제 해결
 
 // 게임 시작 플래그 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
 }
+
 // 캔버스 및 그리기 컨텍스트 설정
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-
 // 난이도 변수 불러오기
-const difficulty = localStorage.getItem('selectedDifficulty');
+const difficulty = localStorage.getItem('selectedDifficulty') || 'easy';
 let temp_diff;
 let diff_var;
-console.log("현재 난이도 : %s",difficulty);
+console.log("현재 난이도 : %s", difficulty);
 
 // 난이도 별 난이도 변수 설정
 switch(difficulty){
@@ -28,7 +28,7 @@ switch(difficulty){
         break;
     default:
         temp_diff = "easy"
-        console.log("임시 난이도 : %s",temp_diff);
+        console.log("임시 난이도 : %s", temp_diff);
         diff_var = 1;
         break;
 }
@@ -39,16 +39,15 @@ let y = canvas.height * 0.4;
 let dx = 0;
 let dy = 0;
 const ballRadius = 7;
-let ballRotation = 0; // 공의 현재 회전 각도 (라디안)
-let ballRotationSpeed = 0; // 공의 회전 속도
+let ballRotation = 0;
+let ballRotationSpeed = 0;
 
-
-//공 초기상태 초기화 함수
+// 공 초기상태 초기화 함수
 function ball_init(){
     x = canvas.width / 2;
     y = canvas.height * 0.4;
     dx = 0;
-    dy = diff_var*2;
+    dy = diff_var * 2;
     ballRotation = 0; 
     ballRotationSpeed = 0; 
 }
@@ -61,57 +60,57 @@ let barPosX = (canvas.width - barWidth) / 2;
 const barPosY = canvas.height - barHeight;
 let barMoveSpeed = 10;
 
-
 let lives = 5;
 let score = 0;
 
-//여기에 세팅값에 따른 공 속도 및 스테이지 설정 추가
-
-
-
-const blockImage = new Image();
-let imagesLoaded = 0;
-
-
-blockImage.src = "https://placehold.co/100x20/FF0000/FFFFFF";
-
-// 이미지 로딩 상태 확인 함수 - gameStarted 플래그 확인 추가
-function checkImagesLoaded() {
-    imagesLoaded++;
-    // temp_Stage.js에서 이미 게임이 시작되었는지 확인
-    if (imagesLoaded === 2 && !window.gameStarted) {
-        window.gameStarted = true;
-        requestAnimationFrame(draw);
-    }
+// 게임 상태 리셋 함수
+function resetGameState() {
+    ball_init();
+    barPosX = (canvas.width - barWidth) / 2;
+    lives = 6 - diff_var;
+    score = 0;
+    console.log("게임 상태 초기화 완료");
 }
 
-// 이미지 로딩 실패 시에도 게임 시작 - gameStarted 플래그 확인 추가
-function handleImageError() {
-    console.warn("이미지 로딩 실패, 기본 스타일로 진행합니다.");
+// 스테이지 준비 완료 콜백
+window.onStageReady = function() {
+    console.log("스테이지 준비 완료! 게임 시작");
+    resetGameState();
+    
     if (!window.gameStarted) {
         window.gameStarted = true;
         requestAnimationFrame(draw);
     }
-}
+};
 
-// 이벤트 등록
-barImage.onload = checkImagesLoaded;
-blockImage.onload = checkImagesLoaded;
-
-barImage.onerror = handleImageError;
-blockImage.onerror = handleImageError;
-
-// 이미지 로딩 상태 확인 후 강제로 게임 시작하는 타이머 설정 (5초 후 무조건 실행)
-setTimeout(() => {
-    if (imagesLoaded < 2 && !window.gameStarted) {
-        console.warn("이미지 로딩 지연, 강제 게임 시작");
+// 게임 시작 준비 확인 (백업 방법)
+function startGameWhenReady() {
+    const imagesReady = window.barImage && window.ballImage;
+    const blocksReady = window.blocks && window.blocks.length > 0;
+    const stageReady = window.stageReady;
+    
+    console.log("로딩 상태 체크:", {
+        imagesReady,
+        blocksReady,
+        stageReady,
+        gameStarted: window.gameStarted
+    });
+    
+    if (imagesReady && blocksReady && stageReady && !window.gameStarted) {
+        console.log("모든 리소스 로딩 완료, 게임 시작");
+        resetGameState();
         window.gameStarted = true;
         requestAnimationFrame(draw);
+    } else if (!window.gameStarted) {
+        // 500ms 후 다시 확인 (더 여유있게)
+        setTimeout(startGameWhenReady, 500);
     }
-}, 5000);
+}
+
+// 초기 게임 시작 체크 (3초 후 시작)
+setTimeout(startGameWhenReady, 1000);
 
 // 마우스 이동 이벤트
-
 canvas.addEventListener('mousemove', mouseMoveHandler);
 
 function mouseMoveHandler(e) {
@@ -124,13 +123,11 @@ function mouseMoveHandler(e) {
     barPosX = nextBarPos;
 }
 
-
-
-
-
 function collisionDetection() {
-    for (let i = 0; i < blocks.length; i++) {
-        const b = blocks[i];
+    if (!window.blocks) return;
+    
+    for (let i = 0; i < window.blocks.length; i++) {
+        const b = window.blocks[i];
         if (b.status === 1) {
             // 충돌 여부 확인 (공 중심 + 반지름 고려)
             const collided =
@@ -178,16 +175,13 @@ function collisionDetection() {
     }
 }
 
-//회전 속도 함수
+// 회전 속도 함수
 function updateBallRotation() {
-    // dx가 양수면 시계방향, 음수면 반시계방향
-    const speed = Math.sqrt(dx * dx + dy * dy); // 공의 전체 속도
-    ballRotationSpeed = (dx / ballRadius) * 0.1; // 회전 속도는 수평 속도에 비례
+    const speed = Math.sqrt(dx * dx + dy * dy);
+    ballRotationSpeed = (dx / ballRadius) * 0.1;
     
-    // 회전 각도 업데이트
     ballRotation += ballRotationSpeed;
     
-    // 360도(2π) 넘어가면 초기화 (성능 최적화)
     if (ballRotation > Math.PI * 2) {
         ballRotation -= Math.PI * 2;
     } else if (ballRotation < -Math.PI * 2) {
@@ -200,15 +194,14 @@ function drawBall() {
     ctx.translate(x, y);
     ctx.rotate(ballRotation);
     if (window.ballImage && window.ballImage.complete && window.ballImage.naturalWidth > 0) {
-        ctx.drawImage(window.ballImage, - ballRadius, - ballRadius, ballRadius * 2, ballRadius * 2);
+        ctx.drawImage(window.ballImage, -ballRadius, -ballRadius, ballRadius * 2, ballRadius * 2);
     } else {
         ctx.beginPath();
-        ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+        ctx.arc(0, 0, ballRadius, 0, Math.PI * 2);
         ctx.fillStyle = "#FF0000";
         ctx.fill();
         ctx.closePath();
     }
-
     ctx.restore();
 }
 
@@ -222,72 +215,103 @@ function drawBar() {
 }
 
 function drawBlocks() {
-    blocks.forEach((block, index) => {
+    if (!window.blocks) return;
+    
+    window.blocks.forEach((block, index) => {
         if (block.status === 1) {
-            // 내부 블럭 (Grass): imgSet이 blockImgs
-            if (block.imgSet === blockImgs) {
-                // [★] hits(1~3)에 맞는 이미지를 매번 동적으로 고름!
-                let hitsToIdx = Math.max(0, Math.min(2, block.hits - 1)); // 0,1,2
-                const img = block.imgSet[hitsToIdx];
+            // 내부 블럭 (Grass): imgSet 확인
+            if (block.type === "grass" && window.blockImgs) {
+                let hitsToIdx = Math.max(0, Math.min(2, block.hits - 1));
+                const img = window.blockImgs[hitsToIdx];
                 if (img && img.complete && img.naturalWidth > 0) {
                     ctx.drawImage(img, block.x, block.y, block.width, block.height);
                 } else {
-                    ctx.fillStyle = "#FF0000";
+                    ctx.fillStyle = "#00FF00";
                     ctx.fillRect(block.x, block.y, block.width, block.height);
                 }
             }
-            // 외곽 블럭 (General): imgIdx를 고정적으로 사용
-            else if (block.imgSet === generalBlockImgs) {
-                const img = block.imgSet[block.imgIdx];
+            // 외곽 블럭 (General)
+            else if (block.type === "general" && window.generalBlockImgs) {
+                const img = window.generalBlockImgs[block.imgIdx];
                 if (img && img.complete && img.naturalWidth > 0) {
                     ctx.drawImage(img, block.x, block.y, block.width, block.height);
                 } else {
                     ctx.fillStyle = "#222";
                     ctx.fillRect(block.x, block.y, block.width, block.height);
                 }
+            } else {
+                // 기본 색상
+                ctx.fillStyle = block.type === "grass" ? "#00FF00" : "#222";
+                ctx.fillRect(block.x, block.y, block.width, block.height);
             }
-            // 테두리와 숫자 표시는 항상
+            
+            // 테두리
             ctx.strokeStyle = "#222";
             ctx.strokeRect(block.x, block.y, block.width, block.height);
-            ctx.fillStyle = "#fff";
-            ctx.font = "18px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-
         }
     });
 }
 
-//게임 오버 관련 변수
+
 let isGameOver = false;
 
 function drawScoreAndLives() {
     // 점수표시 : 상단바
-    document.querySelector(".score-container").textContent = "Score: " + score;
+    const scoreContainer = document.querySelector(".score-container");
+    if (scoreContainer) {
+        scoreContainer.textContent = "Score: " + score;
+    }
+    
     // HP 이미지 표시
     const livesDiv = document.querySelector(".lives-container");
-    livesDiv.innerHTML = ""; // 초기화
 
-    for (let i = 0; i < lives; i++) {
-        const img = document.createElement("img");
-        img.src = "res/gameImage/HP_ball.png";
-        img.width = 26;
-        img.height = 26;
-        img.alt = "체력";
-        livesDiv.appendChild(img);
+    if (livesDiv) {
+        livesDiv.innerHTML = "";
+        for (let i = 0; i < lives; i++) {
+            const img = document.createElement("img");
+            img.src = "res/gameImage/HP_ball.png";
+            img.width = 26;
+            img.height = 26;
+            img.alt = "체력";
+            livesDiv.appendChild(img);
+        }
     }
 }
 
 let isPaused = false;
 
-////////////////////////////설정관련 함수///////////////////////////////
-
 // 오버레이 show/hide 함수
 function showPauseOverlay() {
-    $("#pauseOverlay").css("display", "flex");
+    const overlay = document.getElementById("pauseOverlay");
+    if (overlay) overlay.style.display = "flex";
 }
+
 function hidePauseOverlay() {
-    $("#pauseOverlay").hide();
+    const overlay = document.getElementById("pauseOverlay");
+    if (overlay) overlay.style.display = "none";
+}
+
+// 설정 모달 show/hide 함수
+function showSettingsModal() {
+    console.log("설정 모달 표시");
+    const settingsModal = document.getElementById("settingsModal");
+    if (settingsModal) {
+        settingsModal.classList.remove('hidden');
+        hidePauseOverlay(); // pause overlay 숨기기
+    } else {
+        console.log("설정 모달을 찾을 수 없음");
+    }
+}
+
+function hideSettingsModal() {
+    console.log("설정 모달 숨기기");
+    const settingsModal = document.getElementById("settingsModal");
+    if (settingsModal) {
+        settingsModal.classList.add('hidden');
+        showPauseOverlay(); // pause overlay 다시 표시
+    } else {
+        console.log("설정 모달을 찾을 수 없음");
+    }
 }
 
 
@@ -313,82 +337,134 @@ function togglePause(triggeredByOverlay = false) {
   }
 }
 
-// 설정 버튼 누를 시 일시정지 후 오버레이
-$(".settings").on("click", function () {
-    togglePause();
-});
+// 이벤트 리스너 등록 함수 - DOM 상태에 관계없이 작동
+function setupEventListeners() {
+    console.log("이벤트 리스너 설정 시작");
 
-$(document).on("keydown", function (e) {
-    if (!settingsModal.classList.contains('hidden') && (e.key === "Escape" || e.key === "Esc")) {
-        settingsModal.classList.add('hidden');
-        pauseOverlay.style.display = 'flex';
-        return;
+    // 설정 버튼
+    const settingsBtn = document.querySelector(".settings");
+    if (settingsBtn) {
+        console.log("설정 버튼 찾음, 이벤트 리스너 추가");
+        settingsBtn.addEventListener("click", function() {
+            console.log("설정 버튼 클릭됨");
+            togglePause();
+        });
+    } else {
+        console.log("설정 버튼을 찾을 수 없음");
     }
-    if (isPaused && (e.key === "Escape" || e.key === "Esc")) {
-        togglePause(true);
+
+    // 재개하기 버튼
+    const resumeBtn = document.getElementById("resumeBtn");
+    if (resumeBtn) {
+        console.log("재개 버튼 찾음, 이벤트 리스너 추가");
+        resumeBtn.addEventListener("click", function() {
+            console.log("재개 버튼 클릭됨");
+            togglePause(true);
+        });
+    } else {
+        console.log("재개 버튼을 찾을 수 없음");
     }
-    else if(!isPaused && (e.key === "Escape" || e.key === "Esc")){
-        togglePause(false);
+
+    // 다시시작 버튼
+    const restartBtn = document.getElementById("restartBtn");
+    if (restartBtn) {
+        console.log("다시시작 버튼 찾음, 이벤트 리스너 추가");
+        restartBtn.addEventListener("click", function() {
+            console.log("다시시작 버튼 클릭됨");
+            location.reload();
+        });
+    } else {
+        console.log("다시시작 버튼을 찾을 수 없음");
     }
-});
 
-// 재개하기 버튼
-$("#resumeBtn").on("click", function () {
-    togglePause(true);
-});
+    // 메인 메뉴 버튼
+    const mainMenuBtn = document.getElementById("mainMenu");
+    if (mainMenuBtn) {
+        console.log("메인메뉴 버튼 찾음, 이벤트 리스너 추가");
+        mainMenuBtn.addEventListener("click", function() {
+            console.log("메인메뉴 버튼 클릭됨");
+            window.location.href = "index.html";
+        });
+    } else {
+        console.log("메인메뉴 버튼을 찾을 수 없음");
+    }
 
-// 다시시작 버튼
-$("#restartBtn").on("click", function () {
-    location.reload();
-});
+    // 세팅 버튼 (pause overlay 내부의 세팅 버튼)
+    const settingBtn = document.getElementById("setting");
+    if (settingBtn) {
+        console.log("세팅 버튼 찾음, 이벤트 리스너 추가");
+        settingBtn.addEventListener("click", function() {
+            console.log("세팅 버튼 클릭됨");
+            showSettingsModal();
+        });
+    } else {
+        console.log("세팅 버튼을 찾을 수 없음");
+    }
 
+    // 설정 모달 닫기 버튼
+    const modalClose = document.querySelector(".modal-close");
+    if (modalClose) {
+        console.log("모달 닫기 버튼 찾음, 이벤트 리스너 추가");
+        modalClose.addEventListener("click", function() {
+            console.log("모달 닫기 버튼 클릭됨");
+            hideSettingsModal();
+        });
+    } else {
+        console.log("모달 닫기 버튼을 찾을 수 없음");
+    }
+}
 
+// DOM 상태 확인 후 이벤트 리스너 설정
+function initEventListeners() {
+    if (document.readyState === 'loading') {
+        // 아직 로딩 중이면 DOMContentLoaded 대기
+        document.addEventListener('DOMContentLoaded', setupEventListeners);
+    } else {
+        // 이미 로딩 완료된 경우 바로 실행
+        setupEventListeners();
+    }
+}
 
-// 메인 메뉴로 돌아감
-$("#mainMenu").on("click", function () {
-    window.location.href = "index.html";
-});
+// 이벤트 리스너 초기화 호출
+initEventListeners();
 
-// 설정 모달 요소 가져오기
-const settingsModal = document.getElementById('settingsModal');
-const settingBtn = document.getElementById('setting');   // '세팅' 버튼
-const modalCloseBtn = document.querySelector('.modal-close');
-
-// 설정 버튼
-settingBtn.addEventListener('click', function () {
-    pauseOverlay.style.display = 'none'; // 오버레이 숨기고
-    settingsModal.classList.remove('hidden'); // 설정창 보이기
-});
-
-// 'X' 버튼 클릭 시 설정창 닫기
-modalCloseBtn.addEventListener('click', function () {
-    settingsModal.classList.add('hidden'); // 설정창 숨기고
-    pauseOverlay.style.display = 'flex';   // 오버레이 다시 보이기
+// ESC 키 이벤트 (document에 바로 추가)
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape" || e.key === "Esc") {
+        console.log("ESC 키 눌림");
+        const settingsModal = document.getElementById('settingsModal');
+        if (settingsModal && !settingsModal.classList.contains('hidden')) {
+            console.log("설정 모달이 열려있음, 닫기");
+            hideSettingsModal();
+            return;
+        }
+        console.log("일반 pause 토글");
+        togglePause();
+    }
 });
 
 function draw() {
-     if (isPaused || isGameOver) return; //일시정지관련 + 게임 오버 변수 추가
 
+    if (isPaused || isGameOver) return; //일시정지관련 + 게임 오버 변수 추가
      
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawBlocks();
-
     updateBallRotation();
-
     drawBall();
     drawBar();
     drawScoreAndLives();
 
     collisionDetection();
-    //  바 충돌 조기 처리 (즉시 반응)
+    
+    // 바 충돌 조기 처리
     if (
         y + dy > barPosY - ballRadius &&
         x > barPosX &&
         x < barPosX + barWidth &&
         dy > 0
     ) {
-        y = barPosY - ballRadius; // 공을 바 위로 올려줌
+        y = barPosY - ballRadius;
         const hitPos = (x - (barPosX + barWidth / 2)) / (barWidth / 2);
         const speed = Math.sqrt(dx * dx + dy * dy);
         const angle = hitPos * (Math.PI / 3);
@@ -399,6 +475,7 @@ function draw() {
         ballRotationSpeed += hitPos * 0.2;
     }
 
+    // 벽 충돌
     if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
         dx = -dx;
         ballRotationSpeed *= -0.8;
@@ -423,7 +500,7 @@ function draw() {
     x += dx;
     y += dy;
     
-     if (isAllBlocksCleared()) {
+    if (isAllBlocksCleared()) {
         setTimeout(() => {
             alert("STAGE CLEAR!");
             advanceToNextStageOrDifficulty(); // 다음 스테이지로
@@ -434,9 +511,13 @@ function draw() {
 
     requestAnimationFrame(draw);
 }
+
 function isAllBlocksCleared() {
-    return blocks.every(block => block.status === 0);
+    if (!window.blocks) return false;
+    return window.blocks.every(block => block.status === 0 || block.hits === -1);
 }
+
+console.log("WP_10.js 로딩 완료");
 
 
 //게임 오버 관련 함수
