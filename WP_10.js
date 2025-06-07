@@ -15,7 +15,7 @@ let temp_diff;
 let diff_var;
 console.log("현재 난이도 : %s",difficulty);
 
-// 난이도 별 난이도 변수 설정
+// 난이도 별 난이도 변수 설정 
 switch(difficulty){
     case "easy":
         diff_var = 1;
