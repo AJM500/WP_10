@@ -28,6 +28,10 @@
                     } else {
                         console.error('resetGameState가 정의되지 않음');
                     }
+
+                     if(typeof setupBGMVolumeSlider === 'function'){
+                    setupBGMVolumeSlider();
+                }
                 };
                 document.body.appendChild(mainScript);
             };
@@ -87,8 +91,9 @@
         <!--효과음 및 배경음-->
         <audio id="hoverSound" src="res/sound/gameStrat_hoverSound.mp3" preload="auto"></audio>
         <audio id="clickSound" src="res/sound/gameStart_clickSound.mp3" preload="auto"></audio>
-        <audio id="bgmAudio"></audio>
+        <audio id="bgmAudio" preload="auto"></audio>
 
     </div>
+    
 </body>
 </html>

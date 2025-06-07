@@ -580,10 +580,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   //  배경음악 볼륨
-  bgmVolumeSlider.addEventListener('input', (e) => {
+   bgmVolumeSlider.addEventListener('input', (e) => {
     const vol = parseFloat(e.target.value);
     bgmAudio.volume = vol;
     localStorage.setItem('bgmVolume', vol);
+    // 여기 로그 추가했을 때 뜨는지 테스트
+    console.log('슬라이더 작동:', vol, bgmAudio.volume);
   });
 
   const savedBGM = localStorage.getItem('bgmVolume');
@@ -690,3 +692,36 @@ function redirectToMap(difficulty) {
             window.location.href = "firemap.html"; break;
     }
 }
+
+
+
+window.setupBGMVolumeSlider = function() {
+  // 꼭 DOM이 다 그려진 다음에 호출될 것!
+  const bgmAudio = document.getElementById('bgmAudio');
+  const bgmVolumeSlider = document.getElementById('bgmVolume');
+  if (!bgmAudio || !bgmVolumeSlider) {
+    console.log("bgmAudio 또는 bgmVolumeSlider를 찾지 못함!");
+    return;
+  }
+  bgmVolumeSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    bgmAudio.volume = vol;
+    localStorage.setItem('bgmVolume', vol);
+    // console.log('슬라이더 작동:', vol, bgmAudio.volume);
+  });
+  // 저장값 반영
+  const savedBGM = localStorage.getItem('bgmVolume');
+  if (savedBGM !== null) {
+    bgmVolumeSlider.value = savedBGM;
+    bgmAudio.volume = parseFloat(savedBGM);
+  }
+}
+
+mainScript.onload = function(){
+  if(typeof resetGameState === 'function'){
+      resetGameState();
+  }
+  if(typeof setupBGMVolumeSlider === 'function'){
+      setupBGMVolumeSlider();
+  }
+};
