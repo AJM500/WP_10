@@ -222,3 +222,101 @@ input[type="range"]::-moz-range-thumb {
     border: 2px solid #444;
     cursor: pointer;
 }
+
+/* 게임 오버 */
+#gameOverOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1000px;
+    height: 655px;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    font-family: 'Press Start 2P', sans-serif;
+}
+
+/* 중앙 박스 */
+#gameOverOverlay .modal-content {
+    background: #fff;
+    border: 4px solid #222;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 15px #ff2222;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* 텍스트 */
+#gameOverOverlay .modal-header h2 {
+    font-size: 20px;
+    color: #c60000;
+    text-shadow: 1px 1px #000;
+    margin-bottom: 20px;
+}
+
+/* 쓰러진 이미지 */
+#faintedTrainer {
+    display: block;
+    margin: 0 auto 25px auto; /* 상-우-하-좌 */
+    width: 240px;
+    height: auto;
+    transform: scale(1.5); /* 크기 키움 */
+    animation: riseIn 1s ease forwards;
+}
+
+.modal-button {
+    display: inline-block;
+    padding: 12px 36px;
+    margin: 12px auto;
+    background: #ff3c3c;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid #aa0000;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+    text-align: center;
+    min-width: 120px;
+    cursor: pointer;
+}
+
+.modal-button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 12px rgba(255, 50, 50, 0.8);
+}
+
+/* 색상 스타일 */
+.red-btn {
+    background-color: #ff3c3c;
+    color: #fff;
+    border: 2px solid #aa0000;
+}
+.red-btn:hover {
+    background-color: #d40000;
+}
+
+.gray-btn {
+    background-color: #ddd;
+    color: #222;
+    border: 2px solid #888;
+}
+.gray-btn:hover {
+    background-color: #bbb;
+}
+
+/* 트레이너 이미지 애니메이션 */
+@keyframes riseIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 오버레이 박스 페이드인 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

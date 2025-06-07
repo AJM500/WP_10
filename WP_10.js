@@ -257,12 +257,17 @@ function drawBlocks() {
         }
     });
 }
+
+//게임 오버 관련 변수
+let isGameOver = false;
+
 function drawScoreAndLives() {
     // 점수표시 : 상단바
     document.querySelector(".score-container").textContent = "Score: " + score;
     // HP 이미지 표시
     const livesDiv = document.querySelector(".lives-container");
     livesDiv.innerHTML = ""; // 초기화
+
     for (let i = 0; i < lives; i++) {
         const img = document.createElement("img");
         img.src = "res/gameImage/HP_ball.png";
@@ -285,15 +290,27 @@ function hidePauseOverlay() {
     $("#pauseOverlay").hide();
 }
 
-function togglePause(triggeredByOverlay = false) {
-    isPaused = !isPaused;
 
-    if (isPaused) {
-        showPauseOverlay();
-    } else {
-        hidePauseOverlay();
-        requestAnimationFrame(draw);
+//배경음악 관련 코드 추가
+function togglePause(triggeredByOverlay = false) {
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    showPauseOverlay();
+    if (bgmAudio && !bgmAudio.paused) {
+      bgmAudio.pause();
     }
+  } else {
+    hidePauseOverlay();
+
+    // draw 재시작
+    requestAnimationFrame(draw);
+
+    // 배경음악도 다시 재생
+    if (bgmAudio && bgmAudio.paused) {
+      bgmAudio.play().catch(() => {});
+    }
+  }
 }
 
 // 설정 버튼 누를 시 일시정지 후 오버레이
@@ -349,9 +366,8 @@ modalCloseBtn.addEventListener('click', function () {
     pauseOverlay.style.display = 'flex';   // 오버레이 다시 보이기
 });
 
-
 function draw() {
-     if (isPaused) return; //일시정지관련
+     if (isPaused || isGameOver) return; //일시정지관련 + 게임 오버 변수 추가
 
      
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -394,11 +410,14 @@ function draw() {
     else if (y + dy > canvas.height - ballRadius) {
         lives--;
         if (!lives) {
-            alert("GAME OVER");
-            document.location.reload();
-        } else {
+            //게임 오버 화면 추가
+            isGameOver = true;
+            showGameOverScreen();
+            return; 
+        }
+        else {
             ball_init();
-    }
+        }
     }
 
     x += dx;
@@ -407,7 +426,8 @@ function draw() {
      if (isAllBlocksCleared()) {
         setTimeout(() => {
             alert("STAGE CLEAR!");
-            document.location.reload();
+            advanceToNextStageOrDifficulty(); // 다음 스테이지로
+            //document.location.reload(); // 기존 코드
         }, 100);
         return;
     }
@@ -416,4 +436,171 @@ function draw() {
 }
 function isAllBlocksCleared() {
     return blocks.every(block => block.status === 0);
+}
+
+
+//게임 오버 관련 함수
+function showGameOverScreen() {
+    isGameOver = true;
+
+    // 음악 정지
+    if (bgmAudio && !bgmAudio.paused) {
+        bgmAudio.pause();
+    }
+    // lives UI 명시적으로 비움
+    const livesDiv = document.querySelector(".lives-container");
+    if (livesDiv) {
+        livesDiv.innerHTML = "";
+    }
+
+    document.getElementById('gameOverOverlay').classList.remove('hidden');
+}
+
+document.getElementById('retryBtn').addEventListener('click', function () {
+    location.reload(); // 재도전
+});
+
+document.getElementById('homeBtn').addEventListener('click', function () {
+    window.location.href = 'index.html'; // 홈으로
+});
+
+
+
+//설정 관련
+document.addEventListener('DOMContentLoaded', () => {
+  const hoverSound = document.getElementById('hoverSound');
+  const clickSound = document.getElementById('clickSound');
+  const bgmAudio = document.getElementById('bgmAudio');
+
+  const sfxVolumeSlider = document.getElementById('sfxVolume'); //설정창 전역 변수
+  const bgmVolumeSlider = document.getElementById('bgmVolume'); //설정창 전역 변수
+  const closeButton = document.querySelector('.modal-close');
+
+  let bgmStarted = false;
+
+  //  효과음 볼륨
+  sfxVolumeSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    hoverSound.volume = vol;
+    clickSound.volume = vol;
+    localStorage.setItem('sfxVolume', vol);
+  });
+
+  const savedSFX = localStorage.getItem('sfxVolume');
+  if (savedSFX !== null) {
+    sfxVolumeSlider.value = savedSFX;
+    hoverSound.volume = parseFloat(savedSFX);
+    clickSound.volume = parseFloat(savedSFX);
+  }
+
+  //  배경음악 볼륨
+  bgmVolumeSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    bgmAudio.volume = vol;
+    localStorage.setItem('bgmVolume', vol);
+  });
+
+  const savedBGM = localStorage.getItem('bgmVolume');
+  if (savedBGM !== null) {
+    bgmVolumeSlider.value = savedBGM;
+    bgmAudio.volume = parseFloat(savedBGM);
+  }
+
+  //  전체 화면 클릭 시 BGM 재생
+  document.body.addEventListener('click', () => {
+    if (!bgmStarted) {
+      bgmStarted = true;
+      bgmAudio.play().catch(() => {});
+    }
+  });
+
+
+  //  닫기 버튼 동작 + 효과음
+  if (closeButton) {
+    closeButton.addEventListener('mouseenter', () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+    });
+    closeButton.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play();
+      closeSettings();
+    });
+  }
+
+  // 버튼들 사운드
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      hoverSound.currentTime = 0;
+      hoverSound.play();
+    });
+    btn.addEventListener('click', () => {
+      clickSound.currentTime = 0;
+      clickSound.play();
+    });
+  });
+});
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.add('hidden');
+}
+
+
+
+//스테이지 별 배경음악
+const stage = localStorage.getItem("currentStage") || "1";
+
+const bgmAudio = document.getElementById('bgmAudio');
+bgmAudio.src = `res/sound/stage${stage}.mp3`; 
+bgmAudio.loop = true;
+bgmAudio.volume = parseFloat(localStorage.getItem('bgmVolume') || 0.3);
+
+switch (difficulty) {
+    case "easy":   bgmAudio.playbackRate = 1.0; break;
+    case "normal": bgmAudio.playbackRate = 1.2; break;
+    case "hard":   bgmAudio.playbackRate = 1.4; break;
+}
+
+//스테이지 난이도 자동 플레이
+function advanceToNextStageOrDifficulty() {
+    let stage = parseInt(localStorage.getItem("currentStage") || "1");
+    let difficulty = localStorage.getItem("currentDifficulty") || "easy";
+
+    if (stage < 3) {
+        // 다음 스테이지로 진행
+        localStorage.setItem("currentStage", (stage + 1).toString());
+
+        // 현재 맵으로 돌아감
+        redirectToMap(difficulty);
+        return;
+    }
+
+    // stage == 3 → 난이도 전환
+    switch (difficulty) {
+        case "easy":
+            difficulty = "normal"; break;
+        case "normal":
+            difficulty = "hard"; break;
+        case "hard":
+            alert("🎉 모든 난이도 클리어!");
+            window.location.href = "index.html";
+            return;
+    }
+
+    localStorage.setItem("currentDifficulty", difficulty);
+    localStorage.setItem("currentStage", "1");
+
+    // 다음 난이도의 맵으로 이동
+    redirectToMap(difficulty);
+}
+
+function redirectToMap(difficulty) {
+    switch (difficulty) {
+        case "easy":
+            window.location.href = "map.html"; break;
+        case "normal":
+            window.location.href = "watermap.html"; break;
+        case "hard":
+            window.location.href = "firemap.html"; break;
+    }
 }
