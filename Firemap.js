@@ -550,6 +550,19 @@ document.addEventListener('DOMContentLoaded', () => { //스테이지 진행 상�
   if(!sessionStorage.getItem("STAGE")){
     sessionStorage.setItem("STAGE", 'START');
   }
+  else{
+    switch(localStorage.getItem("currentStage")){
+      case "1":
+        sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
+        break;
+      case "2":
+        sessionStorage.setItem("STAGE", 'CLEAR_1');
+        break;
+      case "3":
+        sessionStorage.setItem("STAGE", 'CLEAR_2');
+        break;
+    }
+  }
 
   if(sessionStorage.getItem('STAGE') != 'START' && !sessionStorage.getItem("waterpocketmon")){
     textbox.index = textbox.text.length;  //대사가 끝나야 포켓몬 획득이 가능하기 때문에 아직 못얻었으면 대사가 끝난 처리를 해줌

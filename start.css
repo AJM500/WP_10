@@ -164,3 +164,92 @@ input[type="range"]::-moz-range-thumb {
   border: 2px solid #444;
   cursor: pointer;
 }
+
+.intro-container {
+  width: 500px;
+  min-height: 460px;
+  padding: 24px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border-radius: 20px;
+  box-shadow: 0 0 24px rgba(0,0,0,0.25);
+  background: linear-gradient(to bottom, #dff4f5 60%, #e0ffff 100%);
+}
+
+#professorImage {
+  height: 280px;
+  margin-bottom: 16px;
+  object-fit: contain;
+}
+
+#textBox {
+  width: 90%;
+  min-height: 100px;
+  background: white;
+  border: 3px solid #666;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  padding: 14px 20px;
+  font-size: 17px;
+  font-weight: bold;
+  position: relative;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.arrow {
+  position: absolute;
+  bottom: 6px;
+  right: 16px;
+  font-size: 18px;
+  color: #c0392b;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.hidden {
+  display: none;
+}
+
+#typeChartBox {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.type-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.type-table th,
+.type-table td {
+  border: 1px solid #aaa;
+  padding: 4px 8px;
+  background: #fff;
+}
+
+/* 상성표 테마 색상 */
+.type-table td.grass {
+  background-color: #6AB04C;
+  color: white;
+  font-weight: bold;
+}
+
+.type-table td.water {
+  background-color: #3498DB;
+  color: white;
+  font-weight: bold;
+}
+
+.type-table td.fire {
+  background-color: #E74C3C;
+  color: white;
+  font-weight: bold;
+}
