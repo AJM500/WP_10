@@ -688,12 +688,27 @@ function advanceToNextStageOrDifficulty() {
     let stage = parseInt(localStorage.getItem("currentStage") || "1");
     let difficulty = localStorage.getItem("currentDifficulty") || "easy";
 
-    if (stage < 3) {
-        // 다음 스테이지로 진행
-        localStorage.setItem("currentStage", (stage + 1).toString());
+    
 
-        // 현재 맵으로 돌아감
-        redirectToMap(difficulty);
+    if (stage < 3) {
+        let nextStageNum = stage; // 1-based
+        let nextStageJs = "";
+        if(difficulty == "easy"){
+            nextStageJs = `stage_0${nextStageNum}.js`;
+        }
+        else if(difficulty == "normal"){
+            nextStageJs = `stage_0${nextStageNum + 3}.js`;
+        }
+        else if(difficulty == "hard"){
+            nextStageJs = `stage_0${nextStageNum + 6}.js`;
+        }
+        localStorage.setItem('nextStage', nextStageJs);
+
+        // 스테이지 값 업데이트
+        localStorage.setItem("currentStage", (stage + 1).toString());
+        
+        // 페이지 새로고침으로 다음 스테이지 로드
+        location.reload();
         return;
     }
 
@@ -710,9 +725,10 @@ function advanceToNextStageOrDifficulty() {
     }
 
     localStorage.setItem("currentDifficulty", difficulty);
+    
     localStorage.setItem("currentStage", "1");
 
-    // 다음 난이도의 맵으로 이동
+   
     redirectToMap(difficulty);
 }
 
