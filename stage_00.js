@@ -11,24 +11,19 @@ const generalBlockImgs = [
     new Image()
 ];
 generalBlockImgs[0].src = "res/gameImage/General_block1.png";
-generalBlockImgs[1].src = "res/gameImage/General_block1.png";
-generalBlockImgs[2].src = "res/gameImage/General_block2.png";
+generalBlockImgs[1].src = "res/gameImage/General_block2.png";
+generalBlockImgs[2].src = "res/gameImage/General_block3.png";
 
 // [Stage1] grass block 이미지셋 선언 (blockImgs)
 const blockImgs = [
     new Image(),
     new Image(),
-    new Image(),
-    new Image(),
-    new Image(),
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
-blockImgs[1].src = "res/gameImage/Grass_block1_40.png";
-blockImgs[2].src = "res/gameImage/Grass_block2_40.png";
-blockImgs[3].src = "res/gameImage/Grass_block2_40.png";
-blockImgs[4].src = "res/gameImage/Grass_block3_40.png";
-blockImgs[5].src = "res/gameImage/Grass_block3_40.png";
+blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
+
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -55,7 +50,7 @@ class Block {
         this.y = y;         // y좌표
         this.width = 40;    // 블럭 너비 (64로 맞춤)
         this.height = 40;   // 블럭 높이
-        this.hits = hits;   // 블럭 체력(1~6)
+        this.hits = hits;   // 블럭 체력(1~3)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
         this.type = type; // "grass" or "general"
@@ -81,9 +76,6 @@ for (let y = 40; y < 600; y += 40) {
 for(let x = 460; x <= 490; x += 40)
     blocks.push(new Block(x, 160, 3, Math.floor(Math.random()*3), "grass", blockImgs));
 
-for(let i = 1; i <= 6; i++) {
-    blocks.push(new Block(200 + (i-1)*80, 200, i, Math.floor(Math.random()*3), "grass", blockImgs));
-}
 
 // window 객체에 할당
 window.blocks = blocks;

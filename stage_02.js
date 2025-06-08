@@ -21,11 +21,9 @@ const blockImgs = [
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
-blockImgs[1].src = "res/gameImage/Grass_block1_40.png";
-blockImgs[2].src = "res/gameImage/Grass_block2_40.png";
-blockImgs[3].src = "res/gameImage/Grass_block2_40.png";
-blockImgs[4].src = "res/gameImage/Grass_block3_40.png";
-blockImgs[5].src = "res/gameImage/Grass_block3_40.png";
+blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
+
 
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
@@ -55,7 +53,7 @@ class Block {
         this.y = y;         // y좌표
         this.width = 40;    // 블럭 너비 (64로 맞춤)
         this.height = 40;   // 블럭 높이
-        this.hits = hits;   // 블럭 체력(1~6)
+        this.hits = hits;   // 블럭 체력(1~3)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
         this.type = type; // "grass" or "general"
@@ -79,23 +77,23 @@ for (let y = 40; y < 600; y += 40) {
 // === [3] 내부블럭 - Stage 2 패턴 ===
 // 상단 중앙 큰 블럭
 for (let x = 380; x <= 580; x += 40)
-    blocks.push(new Block(x, 120, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 120, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // 중간 좌우 블럭
 for (let x = 120; x <= 280; x += 40)
-    blocks.push(new Block(x, 200, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 680; x <= 840; x += 40)
-    blocks.push(new Block(x, 200, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // 중앙 세로 라인
 for (let y = 280; y <= 400; y += 40)
-    blocks.push(new Block(480, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(480, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // 하단 좌우 블럭
 for (let x = 200; x <= 320; x += 40)
-    blocks.push(new Block(x, 450, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 450, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 640; x <= 760; x += 40)
-    blocks.push(new Block(x, 450, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 450, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // window 객체에 할당
 window.blocks = blocks;

@@ -21,11 +21,9 @@ const blockImgs = [
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Fire_block1_25.png";
-blockImgs[1].src = "res/gameImage/Fire_block1_25.png";
-blockImgs[2].src = "res/gameImage/Fire_block2_25.png";
-blockImgs[3].src = "res/gameImage/Fire_block2_25.png";
-blockImgs[4].src = "res/gameImage/Fire_block3_25.png";
-blockImgs[5].src = "res/gameImage/Fire_block3_25.png";
+blockImgs[1].src = "res/gameImage/Fire_block2_25.png";
+blockImgs[2].src = "res/gameImage/Fire_block3_25.png";
+
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -88,9 +86,9 @@ for (let x = 550; x <= 700; x += 25)
     blocks.push(new Block(x, 120, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 for (let x = 750; x <= 875; x += 25)
     blocks.push(new Block(x, 120, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
-blocks.push(new Block(325, 120, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(525, 120, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(725, 120, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(325, 120, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(525, 120, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(725, 120, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 
 for (let x = 150; x <= 300; x += 25)
@@ -101,8 +99,8 @@ for (let x = 550; x <= 700; x += 25)
     blocks.push(new Block(x, 350, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 for (let x = 750; x <= 875; x += 25)
     blocks.push(new Block(x, 350, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
-blocks.push(new Block(325, 350, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(725, 350, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(325, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(725, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 blocks.push(new Block(150, 170, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(150, 195, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
@@ -112,13 +110,13 @@ blocks.push(new Block(875, 170, -1, Math.floor(Math.random()*3), "general", gene
 blocks.push(new Block(875, 195, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(875, 275, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(875, 300, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
-blocks.push(new Block(150, 145, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(875, 325, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(150, 325, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(875, 145, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(150, 145, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(875, 325, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(150, 325, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(875, 145, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 for (let x = 200; x <= 800; x += 75)
-    blocks.push(new Block(x, 240, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+    blocks.push(new Block(x, 240, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 // window 객체에 할당
 window.blocks = blocks;
