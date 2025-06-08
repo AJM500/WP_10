@@ -545,17 +545,18 @@ document.addEventListener('DOMContentLoaded', () => { //스테이지 진행 상�
   if(!sessionStorage.getItem("STAGE")){
     sessionStorage.setItem("STAGE", 'START');
   }
-
-  switch(localStorage.getItem("currentStage")){
-  case "1":
-    sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
-    break;
-  case "2":
-    sessionStorage.setItem("STAGE", 'CLEAR_1');
-    break;
-  case "3":
-    sessionStorage.setItem("STAGE", 'CLEAR_2');
-    break;
+  else{
+    switch(localStorage.getItem("currentStage")){
+      case "1":
+        sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
+        break;
+      case "2":
+        sessionStorage.setItem("STAGE", 'CLEAR_1');
+        break;
+      case "3":
+        sessionStorage.setItem("STAGE", 'CLEAR_2');
+        break;
+    }
   }
 
   if(sessionStorage.getItem('STAGE') != 'START' && !sessionStorage.getItem("grasspocketmon")){
