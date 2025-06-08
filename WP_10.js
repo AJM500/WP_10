@@ -413,6 +413,7 @@ function setupEventListeners() {
         console.log("메인메뉴 버튼 찾음, 이벤트 리스너 추가");
         mainMenuBtn.addEventListener("click", function() {
             console.log("메인메뉴 버튼 클릭됨");
+            localStorage.setItem("Scores", "0");
             window.location.href = "index.html";
         });
     } else {
@@ -542,6 +543,9 @@ function draw() {
     if (isAllBlocksCleared()) {
         setTimeout(() => {
             alert("STAGE CLEAR!");
+            let totalScore = parseInt(localStorage.getItem("Scores") || "0",10);
+            totalScore += score
+            localStorage.setItem("Scores",totalScore.toString());
             advanceToNextStageOrDifficulty(); // 다음 스테이지로
             //document.location.reload(); // 기존 코드
         }, 100);
