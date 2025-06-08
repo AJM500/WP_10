@@ -23,7 +23,6 @@ const blockImgs = [
 blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
 blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
 blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
-
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -73,9 +72,23 @@ for (let y = 40; y < 600; y += 40) {
 }
 
 // === [3] 내부블럭 ===
-for(let x = 460; x <= 490; x += 40)
-    blocks.push(new Block(x, 160, 3, Math.floor(Math.random()*3), "grass", blockImgs));
+for(let x = 300; x <= 620; x += 40)
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+for(let x = 140; x <= 260; x += 40)
+    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+for(let x = 660; x <= 780; x += 40)
+    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
+
+for(let x = 140; x <= 260; x += 40)
+    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+for(let x = 660; x <= 780; x += 40)
+    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+
+for(let x = 300; x <= 400; x += 80)
+    blocks.push(new Block(x, 310, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+for(let x = 550; x <= 650; x += 80)
+    blocks.push(new Block(x, 310, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // window 객체에 할당
 window.blocks = blocks;

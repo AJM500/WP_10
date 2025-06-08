@@ -88,6 +88,8 @@ for (let x = 680; x <= 840; x += 40)
 // 중앙 세로 라인
 for (let y = 280; y <= 400; y += 40)
     blocks.push(new Block(400, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+for (let y = 280; y <= 400; y += 40)
+    blocks.push(new Block(550, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // 하단 좌우 블럭
 for (let x = 200; x <= 320; x += 40)
