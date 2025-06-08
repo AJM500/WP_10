@@ -158,10 +158,10 @@ document.addEventListener("keydown", e => {
 
   }
 
-  // if(e.key == 'c'){  //체크용
-  //   console.log("x:",player.x,"y:",player.y);
-  //   console.log(sessionStorage.getItem("STAGE"));
-  // }
+  if(e.key == 'c'){  //체크용
+    console.log("x:",player.x,"y:",player.y);
+    console.log(sessionStorage.getItem("STAGE"));
+  }
 
 });
 
@@ -195,20 +195,25 @@ function challenge(){  //합칠 때 게임 로드 하도록 수정
 
   switch(sessionStorage.getItem('STAGE')){
   case 'BEFORE_STAGE':
-    alert("BEFORE_STAGE");
-    sessionStorage.setItem('STAGE', 'CLEAR_1');
+    localStorage.setItem("currentStage", "1");
+    // alert("BEFORE_STAGE");
+    // sessionStorage.setItem('STAGE', 'CLEAR_1');
     break;
 
   case "CLEAR_1":
-    alert("CLEAR_1");
-    sessionStorage.setItem('STAGE', 'CLEAR_2');
+    localStorage.setItem("currentStage", "2");
+    // alert("CLEAR_1");
+    // sessionStorage.setItem('STAGE', 'CLEAR_2');
     break;
 
   case "CLEAR_2":
-    alert("CLEAR_2");
-    sessionStorage.setItem('STAGE', 'CLEAR_3');
+    localStorage.setItem("currentStage", "3");
+    // alert("CLEAR_2");
+    // sessionStorage.setItem('STAGE', 'CLEAR_3');
     break;
   }
+
+  window.location.href = "WP_10.html";
 }
 
 function interact(){
@@ -560,8 +565,20 @@ document.addEventListener('DOMContentLoaded', () => { //스테이지 진행 상�
     sessionStorage.setItem("STAGE", 'START');
   }
 
+  switch(localStorage.getItem("currentStage")){
+  case "1":
+    sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
+    break;
+  case "2":
+    sessionStorage.setItem("STAGE", 'CLEAR_1');
+    break;
+  case "3":
+    sessionStorage.setItem("STAGE", 'CLEAR_2');
+    break;
+  }
+
   if(sessionStorage.getItem('STAGE') != 'START' && !sessionStorage.getItem("firepocketmon")){
-    textbox.index = textbox.text.length;  //대사가 끝나야 포켓몬 획득이 가능하기 때문에 아직 못얻었으면 대사가 끝난 처리를 해줌
+    textbox.index = textbox.text.length;  //포켓몬을 못 얻었으면 얻을 수 있도록 해줌
   }
 });
 

@@ -191,20 +191,25 @@ function challenge(){  //합칠 때 게임 로드 하도록 수정
 
   switch(sessionStorage.getItem('STAGE')){
   case 'BEFORE_STAGE':
-    alert("BEFORE_STAGE");
-    sessionStorage.setItem('STAGE', 'CLEAR_1');
+    localStorage.setItem("currentStage", "1");
+    // alert("BEFORE_STAGE");
+    // sessionStorage.setItem('STAGE', 'CLEAR_1');
     break;
 
   case "CLEAR_1":
-    alert("CLEAR_1");
-    sessionStorage.setItem('STAGE', 'CLEAR_2');
+    localStorage.setItem("currentStage", "2");
+    // alert("CLEAR_1");
+    // sessionStorage.setItem('STAGE', 'CLEAR_2');
     break;
 
   case "CLEAR_2":
-    alert("CLEAR_2");
-    sessionStorage.setItem('STAGE', 'CLEAR_3');
+    localStorage.setItem("currentStage", "3");
+    // alert("CLEAR_2");
+    // sessionStorage.setItem('STAGE', 'CLEAR_3');
     break;
   }
+
+  window.location.href = "WP_10.html";
 }
 
 function interact(){
@@ -539,6 +544,18 @@ function moveStage(){
 document.addEventListener('DOMContentLoaded', () => { //스테이지 진행 상황에 따른 로드
   if(!sessionStorage.getItem("STAGE")){
     sessionStorage.setItem("STAGE", 'START');
+  }
+
+  switch(localStorage.getItem("currentStage")){
+  case "1":
+    sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
+    break;
+  case "2":
+    sessionStorage.setItem("STAGE", 'CLEAR_1');
+    break;
+  case "3":
+    sessionStorage.setItem("STAGE", 'CLEAR_2');
+    break;
   }
 
   if(sessionStorage.getItem('STAGE') != 'START' && !sessionStorage.getItem("grasspocketmon")){
