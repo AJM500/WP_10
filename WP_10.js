@@ -88,6 +88,9 @@ function resetGameState() {
     score = 0;
     stageTime = 0;
     console.log("게임 상태 초기화 완료");
+
+    window.stageStartTime = Date.now();
+    console.log("⏱ 게임 시작 시각:", window.stageStartTime);
 }
 
 // 스테이지 준비 완료 콜백
@@ -95,7 +98,7 @@ window.onStageReady = function() {
     console.log("스테이지 준비 완료! 게임 시작");
     resetGameState();
 
-    window.stageStartTime = Date.now();
+   
     
     if (!window.gameStarted) {
         window.gameStarted = true;
@@ -549,25 +552,59 @@ function draw() {
     y += dy;
     
     if (isAllBlocksCleared()) {
-        setTimeout(() => {
-            alert("STAGE CLEAR!");
-            //점수 누적
-            let totalScore = parseInt(localStorage.getItem("Scores") || "0",10);
-            totalScore += score
-            localStorage.setItem("Scores",totalScore.toString());
-            //시간 누적
-            stageTime = parseInt((Date.now() - window.stageStartTime) / 1000, 10); // ms 단위
-            let totalTime = parseInt(localStorage.getItem("TotalClearTime") || "0", 10);
-            totalTime += stageTime;
-            localStorage.setItem("TotalClearTime", totalTime.toString());
+    setTimeout(() => {
+        // 점수 누적
+        let totalScore = parseInt(localStorage.getItem("Scores") || "0", 10);
+        totalScore += score;
+        localStorage.setItem("Scores", totalScore.toString());
 
-            advanceToNextStageOrDifficulty(); // 다음 스테이지로
-            //document.location.reload(); // 기존 코드
-        }, 100);
-        return;
-    }
+        // 시간 누적
+        const stageTime = parseInt((Date.now() - window.stageStartTime) / 1000, 10);
+        let totalTime = parseInt(localStorage.getItem("TotalClearTime") || "0", 10);
+        totalTime += stageTime;
+        localStorage.setItem("TotalClearTime", totalTime.toString());
+
+        // 클리어 정보 표시
+        document.getElementById("finalScoreText").textContent = `점수: ${score}`;
+        document.getElementById("playTimeText").textContent = `플레이시간: ${stageTime}초`;
+
+        // 버튼 변경 조건
+        const isLastStage = localStorage.getItem("currentStage") === "3" &&
+                            localStorage.getItem("selectedDifficulty") === "hard";
+
+        // 기존 BGM 정지
+        if (bgmAudio && !bgmAudio.paused) {
+            bgmAudio.pause();
+            bgmAudio.currentTime = 0;
+        }
+
+        // 클리어 음악 설정
+        let clearBGMPath = "res/sound/clear.mp3"; // 기본
+        if (isLastStage) {
+            clearBGMPath = "res/sound/final_clear.mp3"; // 전체 클리어용
+        }
+
+        const clearBGM = new Audio(clearBGMPath);
+        clearBGM.volume = parseFloat(localStorage.getItem("bgmVolume") || "0.3");
+        clearBGM.play();               
+
+        if (isLastStage) {
+            document.querySelector('#showTotalResultBtn').classList.remove('hidden');
+            document.querySelector('#stageClearOverlay button[onclick="goToNext()"]').classList.add('hidden');
+        }
+
+        // 오버레이 표시
+        document.getElementById("stageClearOverlay").classList.remove("hidden");
+
+    }, 100);
+    return;
+}
 
     requestAnimationFrame(draw);
+}
+
+function goToNext() {
+  advanceToNextStageOrDifficulty(); // 기존 함수 호출
 }
 
 function isAllBlocksCleared() {
@@ -623,10 +660,9 @@ registerUserInteractionForBGM();
 //스테이지 난이도 자동 플레이
 function advanceToNextStageOrDifficulty() {
     let stage = parseInt(localStorage.getItem("currentStage") || "1");
-    let difficulty = localStorage.getItem("currentDifficulty") || "easy";
+    let difficulty = localStorage.getItem("selectedDifficulty") || "easy";
 
     
-
     if (stage < 3) {
         let nextStageNum = stage; // 1-based
         let nextStageJs = "";
@@ -645,28 +681,32 @@ function advanceToNextStageOrDifficulty() {
         localStorage.setItem("currentStage", (stage + 1).toString());
         
         // 페이지 새로고침으로 다음 스테이지 로드
-        location.reload();
+        //location.reload();
+        redirectToMap(difficulty); // 스테이지 클리어 후 맵으로 이동
         return;
     }
 
     // stage == 3 → 난이도 전환
     switch (difficulty) {
         case "easy":
-            difficulty = "normal"; break;
+            difficulty = "normal"; 
+            localStorage.setItem("nextStage","stage_03.js");
+            break;
         case "normal":
-            difficulty = "hard"; break;
+            difficulty = "hard"; 
+            localStorage.setItem("nextStage","stage_06.js")
+            break;
         case "hard":
-            alert("🎉 모든 난이도 클리어!");
+
             window.location.href = "index.html";
             return;
     }
 
-    localStorage.setItem("currentDifficulty", difficulty);
+    localStorage.setItem("selectedDifficulty", difficulty);
     
     localStorage.setItem("currentStage", "1");
     sessionStorage.removeItem("STAGE");
 
-   
     redirectToMap(difficulty);
 }
 
@@ -804,3 +844,85 @@ if (document.readyState === 'loading') {
   setupSFXVolumeSlider();
   setupButtonSoundEffects();
 }
+
+// 다음 상대 버튼 클릭
+const nextStageBtn = document.getElementById("nextStageBtn");
+if (nextStageBtn) {
+  nextStageBtn.addEventListener("click", () => {
+    advanceToNextStageOrDifficulty();
+  });
+}
+
+// 나의 플레이 버튼 클릭
+const showTotalBtn = document.getElementById("showTotalResultBtn");
+if (showTotalBtn) {
+  showTotalBtn.addEventListener("click", () => {
+    const totalScore = localStorage.getItem("Scores") || "0";
+    const totalTime = localStorage.getItem("TotalClearTime") || "0";
+
+    document.getElementById("totalScoreText").textContent = `총 점수: ${totalScore}`;
+    document.getElementById("totalTimeText").textContent = `총 플레이 시간: ${totalTime}초`;
+
+    document.getElementById("stageClearOverlay").classList.add("hidden");
+    document.getElementById("totalResultOverlay").classList.remove("hidden");
+
+    const finalMusic = new Audio("res/sound/final_theme.mp3");
+    finalMusic.volume = parseFloat(localStorage.getItem("bgmVolume") || 0.3);
+    finalMusic.play().catch(console.warn);
+  });
+}
+
+
+//강제 트리거 코드
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 'k') {
+    console.log("⚡ 강제 클리어 트리거됨");
+
+    setTimeout(() => {
+        // 점수 누적
+        let totalScore = parseInt(localStorage.getItem("Scores") || "0", 10);
+        totalScore += score;
+        localStorage.setItem("Scores", totalScore.toString());
+
+        // 시간 누적
+        const stageTime = parseInt((Date.now() - window.stageStartTime) / 1000, 10);
+        let totalTime = parseInt(localStorage.getItem("TotalClearTime") || "0", 10);
+        totalTime += stageTime;
+        localStorage.setItem("TotalClearTime", totalTime.toString());
+
+        // 클리어 정보 표시
+        document.getElementById("finalScoreText").textContent = `점수: ${score}`;
+        document.getElementById("playTimeText").textContent = `플레이시간: ${stageTime}초`;
+
+        // 버튼 변경 조건
+        const isLastStage = localStorage.getItem("currentStage") === "3" &&
+                            localStorage.getItem("currentDifficulty") === "hard";
+
+        // 기존 BGM 정지
+        if (bgmAudio && !bgmAudio.paused) {
+            bgmAudio.pause();
+            bgmAudio.currentTime = 0;
+        }
+
+        // 클리어 음악 설정
+        let clearBGMPath = "res/sound/clear.mp3"; // 기본
+        if (isLastStage) {
+            clearBGMPath = "res/sound/final_clear.mp3"; // 전체 클리어용
+        }
+
+        const clearBGM = new Audio(clearBGMPath);
+        clearBGM.volume = parseFloat(localStorage.getItem("bgmVolume") || "0.3");
+        clearBGM.play();               
+
+        if (isLastStage) {
+            document.querySelector('#showTotalResultBtn').classList.remove('hidden');
+            document.querySelector('#stageClearOverlay button[onclick="goToNext()"]').classList.add('hidden');
+        }
+
+        // 오버레이 표시
+        document.getElementById("stageClearOverlay").classList.remove("hidden");
+
+    }, 100);
+    return;
+  }
+});

@@ -11,7 +11,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!--  <script src="setting.js"></script>  -->
 
-    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
     <script>
         window.onload = function () {
@@ -85,6 +85,28 @@
                 <div id="retryBtn" class="modal-button">재도전</div>
                 <div id="homeBtn" class="modal-button">홈으로</div>
             </div>
+        </div>
+
+        <div id="stageClearOverlay" class="hidden">
+        <div class="overlay-box">
+            <h2> 승리했다!</h2>
+            <p id="finalScoreText">점수: 0</p>
+            <p id="playTimeText">플레이시간: 0초</p>
+            <button onclick="goToNext()">다음 상대 ▶</button>
+
+                <!-- 최종 스테이지용 -->
+            <button id="showTotalResultBtn" class="hidden">나의 플레이 ▶</button>
+        </div>
+        </div>
+
+        <!-- 새로 추가: 총 결과 오버레이 -->
+        <div id="totalResultOverlay" class="overlay hidden">
+        <div class="modal">
+            <h2>전체 결과</h2>
+            <p id="totalScoreText">총 점수: </p>
+            <p id="totalTimeText">총 플레이 시간: </p>
+            <button onclick="window.location.href='index.html'">메인으로</button>
+        </div>
         </div>
 
 

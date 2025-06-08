@@ -102,7 +102,6 @@ let textbox = {
     `이곳의 트레이너들은 불타입 포켓몬을 주로 파트너로 둔다고 하지.`,
     `너가 잃어버린 물타입 포켓몬이 이 도시 어딘가에 있을 거란다.`,
     '이 도시의 챔피언이 되는 것은 매우 어려울 거다.',
-    `하지만 포켓몬을 찾는다면 이 도시에서의 포켓몬 배틀에 큰 도움이 되겠지.`,
     `마지막 도시의 챔피언이 되고 싶다면 파란색 건물을 먼저 찾아가보려무나.`,
     '아 그리고 마지막으로 공사현장에는 접근할 수 없단다. 조심하렴.'
   ]
@@ -209,6 +208,8 @@ function challenge(){  //합칠 때 게임 로드 하도록 수정
     // sessionStorage.setItem('STAGE', 'CLEAR_3');
     break;
   }
+
+  window.location.href = "WP_10.html";
 }
 
 function interact(){
@@ -398,7 +399,6 @@ playerImage.onload = () => {
     break;
   }
   
-  window.location.href = "WP_10.html";
 };
 
 function drawBox(){

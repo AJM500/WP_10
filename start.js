@@ -125,7 +125,6 @@ const introLines = [
   "지금 너에게 남은 포켓몬은 노말 타입의 포켓몬뿐이지.",
   "하지만 모험을 시작하면 잃어버린 포켓몬을 찾을 수 있을 거란다.",
   "잃어버린 포켓몬을 찾고 챔피언이 되보렴!",
-  "이 표는 포켓몬의 속성의 상관관계란다. 이것 역시 잘 기억해두렴.",
   "이제 모험을 다시 시작할 준비가 되었니?"
 ];
 
@@ -140,16 +139,10 @@ function openIntroDialog() {
 
 function typeLine(text) {
   const target = document.getElementById('textContent');
-  const chart = document.getElementById('typeChartBox');
   target.textContent = "";
   isTyping = true;
 
-  // 속성표 표시 조건
-  if (currentLine === 6) {
-    chart.classList.remove('hidden');
-  } else {
-    chart.classList.add('hidden');
-  }
+
 
   let i = 0;
   const interval = setInterval(() => {

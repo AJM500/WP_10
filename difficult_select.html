@@ -126,6 +126,15 @@
         pokes.forEach(p => p.classList.remove('selected'));
         poke.classList.add('selected');
         selectedDiff = poke.id;
+        switch(selectedDiff){
+          case "easy":
+            localStorage.setItem("nextStage", "stage_00.js");
+            break;
+          case "normal":
+            localStorage.setItem("nextStage", "stage_03.js");
+          case "hard":
+            localStorage.setItem("nextStage", "stage_06.js");
+        }
         localStorage.setItem('selectedDifficulty', selectedDiff);
         localStorage.setItem("currentStage", "1");//무조건 스테이지 1부터 시작
         confirmBtn.style.display = 'block';
