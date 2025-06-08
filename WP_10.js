@@ -344,6 +344,9 @@ function hideSettingsModal() {
     }
 }
 
+//배경음악 관련 전역변수 선언
+window.bgmStarted = false;
+window.bgmAudio = null;
 
 //배경음악 관련 코드 추가
 function togglePause(triggeredByOverlay = false) {
@@ -584,91 +587,6 @@ document.getElementById('homeBtn').addEventListener('click', function () {
     window.location.href = 'index.html'; // 홈으로
 });
 
-
-
-//설정 관련
-document.addEventListener('DOMContentLoaded', () => {
-  const hoverSound = document.getElementById('hoverSound');
-  const clickSound = document.getElementById('clickSound');
-  const bgmAudio = document.getElementById('bgmAudio');
-
-  const sfxVolumeSlider = document.getElementById('sfxVolume'); //설정창 전역 변수
-  const bgmVolumeSlider = document.getElementById('bgmVolume'); //설정창 전역 변수
-  const closeButton = document.querySelector('.modal-close');
-
-  let bgmStarted = false;
-
-  //  효과음 볼륨
-  sfxVolumeSlider.addEventListener('input', (e) => {
-    const vol = parseFloat(e.target.value);
-    hoverSound.volume = vol;
-    clickSound.volume = vol;
-    localStorage.setItem('sfxVolume', vol);
-  });
-
-  const savedSFX = localStorage.getItem('sfxVolume');
-  if (savedSFX !== null) {
-    sfxVolumeSlider.value = savedSFX;
-    hoverSound.volume = parseFloat(savedSFX);
-    clickSound.volume = parseFloat(savedSFX);
-  }
-
-  //  배경음악 볼륨
-   bgmVolumeSlider.addEventListener('input', (e) => {
-    const vol = parseFloat(e.target.value);
-    bgmAudio.volume = vol;
-    localStorage.setItem('bgmVolume', vol);
-    // 여기 로그 추가했을 때 뜨는지 테스트
-    console.log('슬라이더 작동:', vol, bgmAudio.volume);
-  });
-
-  const savedBGM = localStorage.getItem('bgmVolume');
-  if (savedBGM !== null) {
-    bgmVolumeSlider.value = savedBGM;
-    bgmAudio.volume = parseFloat(savedBGM);
-  }
-
-  //  전체 화면 클릭 시 BGM 재생
-  document.body.addEventListener('click', () => {
-    if (!bgmStarted) {
-      bgmStarted = true;
-      bgmAudio.play().catch(() => {});
-    }
-  });
-
-
-  //  닫기 버튼 동작 + 효과음
-  if (closeButton) {
-    closeButton.addEventListener('mouseenter', () => {
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-    });
-    closeButton.addEventListener('click', () => {
-      clickSound.currentTime = 0;
-      clickSound.play();
-      closeSettings();
-    });
-  }
-
-  // 버튼들 사운드
-  document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('mouseenter', () => {
-      hoverSound.currentTime = 0;
-      hoverSound.play();
-    });
-    btn.addEventListener('click', () => {
-      clickSound.currentTime = 0;
-      clickSound.play();
-    });
-  });
-});
-
-function closeSettings() {
-  document.getElementById('settingsModal').classList.add('hidden');
-}
-
-
-
 //스테이지 별 배경음악
 const stage = localStorage.getItem("currentStage") || "1";
 
@@ -682,6 +600,9 @@ switch (difficulty) {
     case "normal": bgmAudio.playbackRate = 1.2; break;
     case "hard":   bgmAudio.playbackRate = 1.4; break;
 }
+
+//배경음악 재생
+registerUserInteractionForBGM();  
 
 //스테이지 난이도 자동 플레이
 function advanceToNextStageOrDifficulty() {
@@ -727,6 +648,7 @@ function advanceToNextStageOrDifficulty() {
     localStorage.setItem("currentDifficulty", difficulty);
     
     localStorage.setItem("currentStage", "1");
+    sessionStorage.removeItem("STAGE");
 
    
     redirectToMap(difficulty);
@@ -741,6 +663,25 @@ function redirectToMap(difficulty) {
         case "hard":
             window.location.href = "firemap.html"; break;
     }
+}
+
+
+//배경음악 재생 함수
+function registerUserInteractionForBGM() {
+  function tryStartBGM() {
+    if (!window.bgmStarted && bgmAudio) {
+      bgmAudio.play().then(() => {
+        window.bgmStarted = true;
+        console.log("🎵 BGM started");
+      }).catch((err) => {
+        console.warn("BGM play blocked:", err);
+      });
+    }
+  }
+
+  ['click', 'keydown'].forEach(eventType => {
+    document.addEventListener(eventType, tryStartBGM, { once: true });
+  });
 }
 
 
@@ -767,11 +708,83 @@ window.setupBGMVolumeSlider = function() {
   }
 }
 
-mainScript.onload = function(){
-  if(typeof resetGameState === 'function'){
-      resetGameState();
+// 효과음 볼륨 슬라이더 설정
+function setupSFXVolumeSlider() {
+  const hoverSound = document.getElementById('hoverSound');
+  const clickSound = document.getElementById('clickSound');
+  const sfxVolumeSlider = document.getElementById('sfxVolume');
+
+  if (!sfxVolumeSlider || !hoverSound || !clickSound) {
+    console.warn("효과음 요소 또는 슬라이더 누락");
+    return;
   }
-  if(typeof setupBGMVolumeSlider === 'function'){
-      setupBGMVolumeSlider();
+
+  sfxVolumeSlider.addEventListener('input', (e) => {
+    const vol = parseFloat(e.target.value);
+    hoverSound.volume = vol;
+    clickSound.volume = vol;
+    localStorage.setItem('sfxVolume', vol);
+  });
+
+  const savedSFX = localStorage.getItem('sfxVolume');
+  if (savedSFX !== null) {
+    sfxVolumeSlider.value = savedSFX;
+    hoverSound.volume = parseFloat(savedSFX);
+    clickSound.volume = parseFloat(savedSFX);
   }
-};
+}
+
+// 버튼 사운드 효과 (hover / click)
+function setupButtonSoundEffects() {
+  const hoverSound = document.getElementById('hoverSound');
+  const clickSound = document.getElementById('clickSound');
+
+  const buttonIds = [
+    "resumeBtn", "restartBtn", "setting", "mainMenu",
+    "settingBtn", "modalClose"
+  ];
+
+  buttonIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`❌ [사운드 이벤트] ${id} 요소 없음`);
+      return;
+    }
+
+    el.addEventListener('mouseenter', () => {
+      console.log(`🟡 [hover] ${id}`);
+      if (hoverSound) {
+        hoverSound.currentTime = 0;
+        hoverSound.play().catch(err => console.warn(`hoverSound 실패: ${err}`));
+      }
+    });
+
+    el.addEventListener('click', () => {
+      console.log(`🔵 [click] ${id}`);
+      if (clickSound) {
+        clickSound.currentTime = 0;
+        clickSound.play().catch(err => console.warn(`clickSound 실패: ${err}`));
+      }
+
+      if (id === "modalClose") {
+        closeSettings();
+      }
+    });
+  });
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').classList.add('hidden');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setupBGMVolumeSlider();
+    setupSFXVolumeSlider();
+    setupButtonSoundEffects();
+  });
+} else {
+  setupBGMVolumeSlider();
+  setupSFXVolumeSlider();
+  setupButtonSoundEffects();
+}
