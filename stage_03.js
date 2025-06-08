@@ -115,7 +115,7 @@ for (let row = 0; row < 3; row++) {
         const x = 660 + col * 32 - row * 32;
         const y = 300 + row * 32;
         blocks.push(new Block(x, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "water", blockImgs));
-    
+    }
 }
 
 // window 객체에 할당
