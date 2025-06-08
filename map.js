@@ -28,9 +28,40 @@ const pokemonSpot = {
   triggered: false
 };
 
+//박사, 1스테이지 등등 상호작용 가능한 위치
+const stageSpot = {
+  START: {  //시작했을 때(박사 위치)
+    x: 800,
+    y: 55,
+    w: 64,
+    h: 64
+  },
+  BEFORE_STAGE: { //첫번째 건물
+    x: 264,
+    y: 536,
+    w: 40,
+    h: 40
+  },
+
+  CLEAR_1: {  //두번째 건물
+    x: 246,
+    y: 150,
+    w: 40,
+    h: 40
+  },
+
+  CLEAR_2: {  //마지막 건물
+    x: 56,
+    y: 278,
+    w: 40,
+    h: 40
+  }
+}
 
 let player_loop;
 let professor_loop;
+
+let move_loop;
 
 
 let player = {
@@ -66,6 +97,7 @@ let textbox = {
   width: 700,
   height: 200,
   visible: false,
+
   index: 0,
   text: [
     `${playerName}야(아), 왔구나!`,
@@ -77,41 +109,144 @@ let textbox = {
   ]
 };
 
+let textbox_check = {
+  visible: false,
+  index: 0,
+  text: [
+    '아직 맵에서 포켓몬을 찾지 못했습니다.',
+    '이대로 도전하시겠습니까?   yes(e) / no(n)'
+  ]
+}
+
 
 const keys = {};
-document.addEventListener('keydown', e => keys[e.key] = true);
-document.addEventListener('keyup', e => keys[e.key] = false);
+const key_down = e =>{keys[e.key] = true};
+const key_up = e => {keys[e.key] = false};
+
+document.addEventListener('keydown', key_down);
+document.addEventListener('keyup', key_up);
 
 document.addEventListener("keydown", e => {
   if((e.key == "e") && isInteractable()){
+    interact();
+  }
+
+  if((e.key == 'e') && textbox.visible){
+
+    if(textbox.index >= textbox.text.length){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawPlayer();
+      drawProfessor();
+      requestAnimationFrame(pro_loop);
+      textbox.visible = false;
+      sessionStorage.setItem("STAGE", 'BEFORE_STAGE');
+    }
+  }
+
+  if(textbox_check.visible){
+
+    if(e.key == 'e'){
+      if(textbox_check.index >= textbox_check.text.length + 1){
+        remove_check();
+        challenge();
+      }
+    }else if(e.key == 'n'){
+      if(textbox_check.index >= textbox_check.text.length){
+        remove_check();
+      }
+    }
+
+  }
+
+  // if(e.key == 'c'){  //체크용
+  //   console.log("x:",player.x,"y:",player.y);
+  //   console.log(sessionStorage.getItem("STAGE"));
+  // }
+
+});
+
+function check_stage(){ //포켓몬 없이 도전할 때 진행 여부를 확인하기 위해 텍스트 상자 출력
+  cancelAnimationFrame(player_loop);
+  textbox_check.visible = true;
+
+  let click = new Audio("res/sound/클릭.mp3");
+  click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+  click.play();
+
+  ctx.drawImage(
+    textboxImage,
+    textbox.x, textbox.y,
+    textbox.width, textbox.height
+    );
+
+  ctx.font = 'italic 13.5pt Arial';
+  ctx.fillText(textbox_check.text[textbox_check.index++], textbox.x + 100, textbox.y + 100);
+}
+
+function remove_check(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawPlayer();
+  requestAnimationFrame(gameLoop);
+  textbox_check.index = 0;
+}
+
+function challenge(){  //합칠 때 게임 로드 하도록 수정
+  textbox_check.index = 0;
+
+  switch(sessionStorage.getItem('STAGE')){
+  case 'BEFORE_STAGE':
+    alert("BEFORE_STAGE");
+    sessionStorage.setItem('STAGE', 'CLEAR_1');
+    break;
+
+  case "CLEAR_1":
+    alert("CLEAR_1");
+    sessionStorage.setItem('STAGE', 'CLEAR_2');
+    break;
+
+  case "CLEAR_2":
+    alert("CLEAR_2");
+    sessionStorage.setItem('STAGE', 'CLEAR_3');
+    break;
+  }
+}
+
+function interact(){
+  switch(sessionStorage.getItem("STAGE")){
+  case "START":
     cancelAnimationFrame(player_loop);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
     drawProfessor();
     drawBox();
-    
-    let click = new Audio("res/sound/클릭.mp3");
-    click.volume = parseFloat(localStorage.getItem("sfxVolume"));
-    click.play();
-  }
+    break;
 
-  if((e.key == 'e') && textbox.visible){
-
-    if(textbox.index++ < textbox.text.length){
-      let click = new Audio("res/sound/클릭.mp3");
-      click.volume = parseFloat(localStorage.getItem("sfxVolume"));
-      click.play();
+  case "BEFORE_STAGE":
+    if(!sessionStorage.getItem('firepocketmon')){
+      check_stage();
     }else{
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawPlayer();
-      drawProfessor();
-      requestAnimationFrame(pro_loop);
-      textbox.visible = false;
+      challenge();
     }
-  }
+    break;
 
-});
+  case "CLEAR_1":
+    if(!sessionStorage.getItem('firepocketmon')){
+      check_stage();
+    }else{
+      challenge();
+    }
+    break;
+
+  case "CLEAR_2":
+    if(!sessionStorage.getItem('firepocketmon')){
+      check_stage();
+    }else{
+      challenge();
+    }
+    break;
+  }
+}
 
 
 function isBlocked(x, y, width, height) {
@@ -127,15 +262,17 @@ function isBlocked(x, y, width, height) {
     hbX + hbW > zone.x &&
     hbY < zone.y + zone.h &&
     hbY + hbH > zone.y
-  );
+    );
 }
 
-function isInteractable(){  //플레이어가 오박사를 보고있으면 true 반환
+function isInteractable(){  //플레이어가 상호작용 가능한 대상을 보고있으면 true 반환
   let x = player.x;
   let y = player.y;
   let width = player.width;
   let height = player.height;
-  let zone = professor.zone;
+  let zone = stageSpot[sessionStorage.getItem('STAGE')];
+
+  if(zone == undefined) return false;
 
   switch(player.dir){
   case 'up':
@@ -194,14 +331,14 @@ function movePlayer() {
   player.x + player.width > pokemonSpot.x &&
   player.y < pokemonSpot.y + pokemonSpot.height &&
   player.y + player.height > pokemonSpot.y
-) {
-  pokemonSpot.triggered = true;
+  ) {
+    pokemonSpot.triggered = true;
   triggerPokemonCutscene();
   return;
 }
 
-  if (moving) {
-    if (player.frameTick++ > player.frameMax) {
+if (moving) {
+  if (player.frameTick++ > player.frameMax) {
       player.frame = (player.frame + 1) % 3;  // 3프레임
       player.frameTick = 0;
     }
@@ -210,7 +347,6 @@ function movePlayer() {
     player.frameTick = 0;
   }
 
-  console.log(`Player position - x: ${player.x}, y: ${player.y}`);
 }
 
 function drawPlayer() {
@@ -225,11 +361,10 @@ function drawPlayer() {
     sx, sy, frameWidth, frameHeight,
     player.x, player.y,
     player.width, player.height
-  );
+    );
 }
 
 function gameLoop() {
-  // ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.clearRect(player.x, player.y, player.width, player.height);
   movePlayer();
   drawPlayer();
@@ -239,15 +374,21 @@ function gameLoop() {
 function drawBox(){
   textbox.visible = true;
 
+  let click = new Audio("res/sound/클릭.mp3");
+  click.volume = parseFloat(localStorage.getItem("sfxVolume"));
+  click.play();
+
   ctx.drawImage(
     textboxImage,
     textbox.x, textbox.y,
     textbox.width, textbox.height
-  );
+    );
 
   ctx.font = 'italic 13.5pt Arial'; // ✅ 이 줄을 수정하세요
-  ctx.fillText(textbox.text[textbox.index], textbox.x+100, textbox.y+100);
+  ctx.fillText(textbox.text[textbox.index++], textbox.x+100, textbox.y+100);
 }
+
+
 
 function pro_loop(){
   professor_loop = requestAnimationFrame(pro_loop);
@@ -275,7 +416,7 @@ function exit_Professor(){
     cancelAnimationFrame(professor_loop);
     requestAnimationFrame(gameLoop);
   }
- 
+  
   if (moving) {
     if (professor.frameTick++ > professor.frameMax) {
       professor.frame = (professor.frame + 1) % 3;  // 3프레임
@@ -310,24 +451,79 @@ function drawProfessor(){
 }
 
 
-professorImage.onload = () =>{
-  mapData.blockedZones.push({
-    "x": professor.x,
-    "y": professor.y,
-    "w":professor.width,
-    "h":professor.height
-  });
+professorImage.onload = () => {
+  if(sessionStorage.getItem("STAGE") == 'START'){  //박사와 대화하기 전이라면
+    mapData.blockedZones.push({
+      "x": professor.x,
+      "y": professor.y,
+      "w":professor.width,
+      "h":professor.height
+    });
   professor.zone = mapData.blockedZones[mapData.blockedZones.length -1];
 
   drawProfessor();
-
-
   ctx.drawImage(  //느낌표 이미지 출력
     markImage,
     professor.x + 5, professor.y - 15,
     30, 25
     );
+}
 };
+
+function moveStage(){
+  move_loop = requestAnimationFrame(moveStage);
+
+  if(sessionStorage.getItem('STAGE') == 'CLEAR_1'){
+    player.dir = 'down';
+
+    if(player.x == 264 && player.y == 536){
+      keys['ArrowRight'] = true;
+    }else if(player.x == 314 && player.y == 536){
+      keys['ArrowRight'] = false;
+      keys['ArrowUp'] = true;
+    }else if(player.x == 314 && player.y == 300){
+      keys['ArrowUp'] = false;
+      keys['ArrowLeft'] = true;
+    }else if(player.x == 170 && player.y == 300){
+      keys['ArrowLeft'] = false;
+      keys['ArrowUp'] = true;
+    }else if(player.x == 170 && player.y == 150){
+      keys['ArrowUp'] = false;
+      keys['ArrowRight'] = true;
+    }else if(player.x == 242 && player.y == 150){
+      keys['ArrowRight'] = false;
+      player.dir = 'up';
+
+      document.addEventListener('keyup', key_up);
+      document.addEventListener('keydown', key_down);
+      cancelAnimationFrame(move_loop);
+
+      interact();
+    }
+  }else{
+    player.dir = 'down';
+
+    if(player.x == 246 && player.y == 150){
+      keys['ArrowLeft'] = true;
+    }else if(player.x == 160 && player.y == 150){
+      keys['ArrowLeft'] = false;
+      keys['ArrowDown'] = true;
+    }else if(player.x == 160 && player.y == 294){
+      keys['ArrowDown'] = false;
+      keys['ArrowLeft'] = true;
+    }else if(player.x == 50 && player.y == 294){
+      keys['ArrowLeft'] = false;
+      player.dir = 'up';
+
+      document.addEventListener('keyup', key_up);
+      document.addEventListener('keydown', key_down);
+      cancelAnimationFrame(move_loop);
+
+      interact();
+    }
+
+  }
+}
 
 
 playerImage.onload = () => {
@@ -336,10 +532,40 @@ playerImage.onload = () => {
   player.width = frameWidth * 0.7;
   player.height = frameHeight * 0.7;
   console.log("✅ player image loaded", frameWidth, frameHeight);
+
   requestAnimationFrame(gameLoop);
+
+  switch(sessionStorage.getItem('STAGE')){
+  case 'CLEAR_1':
+    player.x = 264;
+    player.y = 536;
+    document.removeEventListener('keyup', key_up);
+    document.removeEventListener('keydown', key_down);
+    requestAnimationFrame(moveStage);
+    break;
+
+  case 'CLEAR_2':
+    player.x = 246;
+    player.y = 150;
+    document.removeEventListener('keyup', key_up);
+    document.removeEventListener('keydown', key_down);
+    requestAnimationFrame(moveStage);
+    break;
+  }
+  
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { //스테이지 진행 상황에 따른 로드
+  if(!sessionStorage.getItem("STAGE")){
+    sessionStorage.setItem("STAGE", 'START');
+  }
+
+  if(sessionStorage.getItem('STAGE') != 'START' && !sessionStorage.getItem("firepocketmon")){
+    textbox.index = textbox.text.length;  //대사가 끝나야 포켓몬 획득이 가능하기 때문에 아직 못얻었으면 대사가 끝난 처리를 해줌
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () =>{
   const hoverSound = document.getElementById('hoverSound');
   const clickSound = document.getElementById('clickSound');
   const settingsBtn = document.querySelector('.settings');
@@ -482,7 +708,7 @@ function triggerPokemonCutscene() {
       click.play();
 
       //  불속성 포켓몬 획득 여부 저장
-      localStorage.setItem("firepocketmon", "true");
+      sessionStorage.setItem("firepocketmon", "true");
 
       overlay.remove();
       document.removeEventListener('keydown', handleKeydown);
