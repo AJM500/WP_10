@@ -21,8 +21,11 @@ const blockImgs = [
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Fire_block1_25.png";
-blockImgs[1].src = "res/gameImage/Fire_block2_25.png";
-blockImgs[2].src = "res/gameImage/Fire_block3_25.png";
+blockImgs[1].src = "res/gameImage/Fire_block1_25.png";
+blockImgs[2].src = "res/gameImage/Fire_block2_25.png";
+blockImgs[3].src = "res/gameImage/Fire_block2_25.png";
+blockImgs[4].src = "res/gameImage/Fire_block3_25.png";
+blockImgs[5].src = "res/gameImage/Fire_block3_25.png";
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -49,7 +52,7 @@ class Block {
         this.y = y;         // y좌표
         this.width = 25;    // 블럭 너비 (64로 맞춤)
         this.height = 25;   // 블럭 높이
-        this.hits = hits;   // 블럭 체력(1~3)
+        this.hits = hits;   // 블럭 체력(1~6)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
         this.type = type; // "fire" or "general"
@@ -76,18 +79,18 @@ for (let y = 25; y <= 575; y += 25) { // 600 - 25 = 575
 blocks.push(new Block(75, 50, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(75, 450, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(75, 250, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
-blocks.push(new Block(50, 50, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(50, 450, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(50, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(50, 50, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(50, 450, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(50, 250, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 
 
 blocks.push(new Block(875, 50, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(875, 450, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
 blocks.push(new Block(875, 250, -1, Math.floor(Math.random()*3), "general", generalBlockImgs));
-blocks.push(new Block(900, 50, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(900, 450, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
-blocks.push(new Block(900, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(900, 50, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(900, 450, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+blocks.push(new Block(900, 250, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 
 
 // [1] 위쪽 general 블럭 
@@ -107,11 +110,11 @@ for (let x = 550; x <= 800; x += 25)
 
 //용암
 for (let y = 150; y <= 350; y += 25) {
-    blocks.push(new Block(250, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+    blocks.push(new Block(250, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
 for (let y =150 ; y <= 350; y += 25) {
-    blocks.push(new Block(750, y, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
+    blocks.push(new Block(750, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
 // window 객체에 할당

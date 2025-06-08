@@ -11,8 +11,9 @@ const generalBlockImgs = [
     new Image()
 ];
 generalBlockImgs[0].src = "res/gameImage/General_block1.png";
-generalBlockImgs[1].src = "res/gameImage/General_block2.png";
-generalBlockImgs[2].src = "res/gameImage/General_block3.png";
+generalBlockImgs[1].src = "res/gameImage/General_block1.png";
+generalBlockImgs[2].src = "res/gameImage/General_block2.png";
+
 
 // [Stage1] grass block 이미지셋 선언 (blockImgs)
 const blockImgs = [
@@ -21,8 +22,11 @@ const blockImgs = [
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
-blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
-blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
+blockImgs[1].src = "res/gameImage/Grass_block1_40.png";
+blockImgs[2].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[3].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[4].src = "res/gameImage/Grass_block3_40.png";
+blockImgs[5].src = "res/gameImage/Grass_block3_40.png";
 
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
@@ -36,7 +40,7 @@ class Block {
         this.y = y;         // y좌표
         this.width = 40;    // 블럭 너비 (64로 맞춤)
         this.height = 40;   // 블럭 높이
-        this.hits = hits;   // 블럭 체력(1~3)
+        this.hits = hits;   // 블럭 체력(1~6)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
         this.type = type; // "grass" or "general"
@@ -59,22 +63,22 @@ for (let y = 40; y < 600; y += 40) {
 
 // === [3] 내부블럭 ===
 for (let x = 180; x <= 350; x += 40)
-    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 440; x <= 560; x += 40)
-    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 650; x <= 820; x += 40)
-    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 for (let x = 80; x <= 350; x += 40)
-    blocks.push(new Block(x, 300, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 300, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 for (let x = 660; x <= 930; x += 40)
-    blocks.push(new Block(x, 300, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 300, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 for (let x = 300; x <= 420; x += 40)
-    blocks.push(new Block(x, 400, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 400, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 for (let x = 520; x <= 640; x += 40)
-    blocks.push(new Block(x, 400, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 400, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 
 

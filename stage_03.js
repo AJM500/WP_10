@@ -21,8 +21,11 @@ const blockImgs = [
     new Image()
 ];
 blockImgs[0].src = "res/gameImage/Water_block1_32.png";
-blockImgs[1].src = "res/gameImage/Water_block2_32.png";
-blockImgs[2].src = "res/gameImage/Water_block3_32.png";
+blockImgs[1].src = "res/gameImage/Water_block1_32.png";
+blockImgs[2].src = "res/gameImage/Water_block2_32.png";
+blockImgs[3].src = "res/gameImage/Water_block2_32.png";
+blockImgs[4].src = "res/gameImage/Water_block3_32.png";
+blockImgs[5].src = "res/gameImage/Water_block3_32.png";
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -49,7 +52,7 @@ class Block {
         this.y = y;         // y좌표
         this.width = 32;    // 블럭 너비 (64로 맞춤)
         this.height = 32;   // 블럭 높이
-        this.hits = hits;   // 블럭 체력(1~3)
+        this.hits = hits;   // 블럭 체력(1~6)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
         this.type = type; // "water" or "general"
@@ -87,7 +90,7 @@ for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 5 ; col++) {
         const x = 160 + col * 32 + row * 32;
         const y = 140 + row * 32;
-        blocks.push(new Block(x, y, 2, Math.floor(Math.random()*3), "water", blockImgs));
+        blocks.push(new Block(x, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "water", blockImgs));
     }
 }
 
@@ -96,7 +99,7 @@ for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 5 ; col++) {
         const x = 660 + col * 32 - row * 32;
         const y = 140 + row * 32;
-        blocks.push(new Block(x, y, 2, Math.floor(Math.random()*3), "water", blockImgs));
+        blocks.push(new Block(x, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "water", blockImgs));
     }
 }
 
@@ -105,7 +108,7 @@ for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 5 ; col++) {
         const x = 160 + col * 32 + row * 32;
         const y = 300 + row * 32;
-        blocks.push(new Block(x, y, 2, Math.floor(Math.random()*3), "water", blockImgs));
+        blocks.push(new Block(x, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "water", blockImgs));
     }
 }
 
@@ -114,7 +117,7 @@ for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 5 ; col++) {
         const x = 660 + col * 32 - row * 32;
         const y = 300 + row * 32;
-        blocks.push(new Block(x, y, 2, Math.floor(Math.random()*3), "water", blockImgs));
+        blocks.push(new Block(x, y, Math.floor(Math.random()*6)+1, Math.floor(Math.random()*3), "water", blockImgs));
     }
 }
 
