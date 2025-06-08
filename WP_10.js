@@ -78,6 +78,7 @@ let barMoveSpeed = 10;
 
 let lives = 5;
 let score = 0;
+let stageTime = 0;
 
 // 게임 상태 리셋 함수
 function resetGameState() {
@@ -85,6 +86,7 @@ function resetGameState() {
     barPosX = (canvas.width - barWidth) / 2;
     lives = 6 - diff_var;
     score = 0;
+    stageTime = 0;
     console.log("게임 상태 초기화 완료");
 }
 
@@ -92,6 +94,8 @@ function resetGameState() {
 window.onStageReady = function() {
     console.log("스테이지 준비 완료! 게임 시작");
     resetGameState();
+
+    window.stageStartTime = Date.now();
     
     if (!window.gameStarted) {
         window.gameStarted = true;
@@ -116,6 +120,7 @@ function startGameWhenReady() {
         console.log("모든 리소스 로딩 완료, 게임 시작");
         resetGameState();
         window.gameStarted = true;
+        
         requestAnimationFrame(draw);
     } else if (!window.gameStarted) {
         // 500ms 후 다시 확인 (더 여유있게)
@@ -546,9 +551,16 @@ function draw() {
     if (isAllBlocksCleared()) {
         setTimeout(() => {
             alert("STAGE CLEAR!");
+            //점수 누적
             let totalScore = parseInt(localStorage.getItem("Scores") || "0",10);
             totalScore += score
             localStorage.setItem("Scores",totalScore.toString());
+            //시간 누적
+            stageTime = parseInt((Date.now() - window.stageStartTime) / 1000, 10); // ms 단위
+            let totalTime = parseInt(localStorage.getItem("TotalClearTime") || "0", 10);
+            totalTime += stageTime;
+            localStorage.setItem("TotalClearTime", totalTime.toString());
+
             advanceToNextStageOrDifficulty(); // 다음 스테이지로
             //document.location.reload(); // 기존 코드
         }, 100);
