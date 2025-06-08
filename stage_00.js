@@ -3,15 +3,16 @@ window.barImage = new Image();
 window.barImage.src = "res/gameImage/Grass_bar.png";
 window.ballImage = new Image();
 window.ballImage.src = "res/gameImage/Grass_ball.png";
+window.bgImageSrc = "res/gameImage/stage1_1.png";
 //외곽 블럭 이미지셋 선언
 const generalBlockImgs = [
     new Image(),
     new Image(),
     new Image()
 ];
-generalBlockImgs[0].src = "res/gameImage/General_block1_32.png";
-generalBlockImgs[1].src = "res/gameImage/General_block2_32.png";
-generalBlockImgs[2].src = "res/gameImage/General_block3_32.png";
+generalBlockImgs[0].src = "res/gameImage/General_block1.png";
+generalBlockImgs[1].src = "res/gameImage/General_block2.png";
+generalBlockImgs[2].src = "res/gameImage/General_block3.png";
 
 // [Stage1] grass block 이미지셋 선언 (blockImgs)
 const blockImgs = [
@@ -19,9 +20,9 @@ const blockImgs = [
     new Image(),
     new Image()
 ];
-blockImgs[0].src = "res/gameImage/Grass_block1_32.png";
-blockImgs[1].src = "res/gameImage/Grass_block2_32.png";
-blockImgs[2].src = "res/gameImage/Grass_block3_32.png";
+blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
+blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -87,25 +88,22 @@ for(let x = 660; x <= 780; x += 40)
 for(let x = 300; x <= 620; x += 80)
     blocks.push(new Block(x, 310, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
-// 여기 이하 코드 복붙(타이밍 이슈 해결용)
-// 먼저 window 객체에 할당
+// window 객체에 할당
 window.blocks = blocks;
 window.blockImgs = blockImgs;
 window.generalBlockImgs = generalBlockImgs;
+window.grassBlockImgs = blockImgs;
 
 // 모든 이미지 로딩 완료 체크 및 게임 시작 신호
-let totalImages = blockImgs.length + generalBlockImgs.length + 2; // +2 for bar and ball
+let totalImages = blockImgs.length + generalBlockImgs.length + 2;
 let loadedImages = 0;
 
 function checkAllImagesLoaded() {
     loadedImages++;
-    console.log(`이미지 로딩: ${loadedImages}/${totalImages}`);
     
     if (loadedImages === totalImages) {
-        console.log("모든 이미지 로딩 완료!");
         window.stageReady = true;
         
-        // 게임 메인 스크립트에 로딩 완료 신호 전송
         if (window.onStageReady) {
             window.onStageReady();
         }
@@ -118,10 +116,7 @@ blockImgs.forEach(img => {
         checkAllImagesLoaded();
     } else {
         img.onload = checkAllImagesLoaded;
-        img.onerror = () => {
-            console.error("블럭 이미지 로딩 실패", img.src);
-            checkAllImagesLoaded(); // 실패해도 카운트
-        };
+        img.onerror = checkAllImagesLoaded;
     }
 });
 
@@ -130,10 +125,7 @@ generalBlockImgs.forEach(img => {
         checkAllImagesLoaded();
     } else {
         img.onload = checkAllImagesLoaded;
-        img.onerror = () => {
-            console.error("일반 블럭 이미지 로딩 실패", img.src);
-            checkAllImagesLoaded(); // 실패해도 카운트
-        };
+        img.onerror = checkAllImagesLoaded;
     }
 });
 
@@ -142,20 +134,12 @@ if (window.barImage.complete) {
     checkAllImagesLoaded();
 } else {
     window.barImage.onload = checkAllImagesLoaded;
-    window.barImage.onerror = () => {
-        console.error("바 이미지 로딩 실패");
-        checkAllImagesLoaded();
-    };
+    window.barImage.onerror = checkAllImagesLoaded;
 }
 
 if (window.ballImage.complete) {
     checkAllImagesLoaded();
 } else {
     window.ballImage.onload = checkAllImagesLoaded;
-    window.ballImage.onerror = () => {
-        console.error("공 이미지 로딩 실패");
-        checkAllImagesLoaded();
-    };
+    window.ballImage.onerror = checkAllImagesLoaded;
 }
-
-console.log("Stage 1 스크립트 로딩 완료");

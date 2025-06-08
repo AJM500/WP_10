@@ -3,16 +3,16 @@ window.barImage = new Image();
 window.barImage.src = "res/gameImage/Grass_bar.png";
 window.ballImage = new Image();
 window.ballImage.src = "res/gameImage/Grass_ball.png";
-
+window.bgImageSrc = "res/gameImage/stage1_2.png";
 //외곽 블럭 이미지셋 선언
 const generalBlockImgs = [
     new Image(),
     new Image(),
     new Image()
 ];
-generalBlockImgs[0].src = "res/gameImage/General_block1_32.png";
-generalBlockImgs[1].src = "res/gameImage/General_block2_32.png";
-generalBlockImgs[2].src = "res/gameImage/General_block3_32.png";
+generalBlockImgs[0].src = "res/gameImage/General_block1.png";
+generalBlockImgs[1].src = "res/gameImage/General_block2.png";
+generalBlockImgs[2].src = "res/gameImage/General_block3.png";
 
 // [Stage1] grass block 이미지셋 선언 (blockImgs)
 const blockImgs = [
@@ -20,9 +20,9 @@ const blockImgs = [
     new Image(),
     new Image()
 ];
-blockImgs[0].src = "res/gameImage/Grass_block1_32.png";
-blockImgs[1].src = "res/gameImage/Grass_block2_32.png";
-blockImgs[2].src = "res/gameImage/Grass_block3_32.png";
+blockImgs[0].src = "res/gameImage/Grass_block1_40.png";
+blockImgs[1].src = "res/gameImage/Grass_block2_40.png";
+blockImgs[2].src = "res/gameImage/Grass_block3_40.png";
 
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
@@ -83,6 +83,7 @@ for (let x = 520; x <= 640; x += 40)
 window.blocks = blocks;
 window.blockImgs = blockImgs;
 window.generalBlockImgs = generalBlockImgs;
+window.grassBlockImgs = blockImgs;
 
 // 모든 이미지 로딩 완료 체크 및 게임 시작 신호
 let totalImages = blockImgs.length + generalBlockImgs.length + 2;

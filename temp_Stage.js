@@ -13,7 +13,7 @@ generalBlockImgs[0].src = "res/gameImage/General_block1_32.png";
 generalBlockImgs[1].src = "res/gameImage/General_block2_32.png";
 generalBlockImgs[2].src = "res/gameImage/General_block3_32.png";
 
-// [Stage1] grass block 이미지셋 선언 (blockImgs)
+// [Stage t] grass block 이미지셋 선언 (blockImgs)
 const blockImgs = [
     new Image(),
     new Image(),

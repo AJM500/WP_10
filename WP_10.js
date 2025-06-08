@@ -4,6 +4,22 @@
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
 }
+//배경이미지 추가
+let bgImage = null;
+let bgImageLoaded = false;
+
+if (window.bgImageSrc) {
+    bgImage = new Image();
+    bgImage.src = window.bgImageSrc;
+    bgImage.onload = function() {
+        console.log("배경 이미지 로드 완료:", bgImage.src);
+        bgImageLoaded = true;
+    };
+    bgImage.onerror = function() {
+        console.error("배경 이미지 로딩 실패!", bgImage.src);
+         bgImageLoaded = false;
+    };
+}
 
 // 캔버스 및 그리기 컨텍스트 설정
 const canvas = document.getElementById("gameCanvas");
@@ -222,41 +238,50 @@ function drawBar() {
 function drawBlocks() {
     if (!window.blocks) return;
     
-    window.blocks.forEach((block, index) => {
+    window.blocks.forEach(block => {
         if (block.status === 1) {
-            // 내부 블럭 (Grass): imgSet 확인
-            if (block.type === "grass" && window.blockImgs) {
-                let hitsToIdx = Math.max(0, Math.min(2, block.hits - 1));
-                const img = window.blockImgs[hitsToIdx];
-                if (img && img.complete && img.naturalWidth > 0) {
-                    ctx.drawImage(img, block.x, block.y, block.width, block.height);
-                } else {
-                    ctx.fillStyle = "#00FF00";
-                    ctx.fillRect(block.x, block.y, block.width, block.height);
-                }
+            let imgSet;
+
+            // 내부블럭 타입별 이미지셋 명확히 구분
+            if (block.type === "grass" && window.grassBlockImgs) {
+                imgSet = window.grassBlockImgs;
+            } else if (block.type === "water" && window.waterBlockImgs) {
+                imgSet = window.waterBlockImgs;
+            } else if (block.type === "fire" && window.fireBlockImgs) {
+                imgSet = window.fireBlockImgs;
+            } else if (block.type === "general" && window.generalBlockImgs) {
+                imgSet = window.generalBlockImgs;
             }
-            // 외곽 블럭 (General)
-            else if (block.type === "general" && window.generalBlockImgs) {
-                const img = window.generalBlockImgs[block.imgIdx];
-                if (img && img.complete && img.naturalWidth > 0) {
-                    ctx.drawImage(img, block.x, block.y, block.width, block.height);
-                } else {
-                    ctx.fillStyle = "#222";
-                    ctx.fillRect(block.x, block.y, block.width, block.height);
-                }
+
+            let img;
+            if (block.type !== "general" && imgSet) {
+                let hitsToIdx = Math.max(0, Math.min(2, block.hits - 1));
+                img = imgSet[hitsToIdx];
+            } else if (block.type === "general" && imgSet) {
+                img = imgSet[block.imgIdx];
+            }
+
+            // 이미지 존재 여부에 따라 렌더링 처리
+            if (img && img.complete && img.naturalWidth > 0) {
+                ctx.drawImage(img, block.x, block.y, block.width, block.height);
             } else {
-                // 기본 색상
-                ctx.fillStyle = block.type === "grass" ? "#00FF00" : "#222";
+                // 기본 색상 처리 (이미지 로딩 실패 대비)
+                ctx.fillStyle = {
+                    "grass": "#00FF00",
+                    "water": "#30a6ff",
+                    "fire": "#e44",
+                    "general": "#222"
+                }[block.type] || "#ccc";
+
                 ctx.fillRect(block.x, block.y, block.width, block.height);
             }
-            
-            // 테두리
+
+            // 테두리 렌더링
             ctx.strokeStyle = "#222";
             ctx.strokeRect(block.x, block.y, block.width, block.height);
         }
     });
 }
-
 
 let isGameOver = false;
 
@@ -451,8 +476,17 @@ document.addEventListener("keydown", function(e) {
 function draw() {
 
     if (isPaused || isGameOver) return; //일시정지관련 + 게임 오버 변수 추가
-     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    //배경 이미지 그리기
+     if (bgImage && bgImage.complete && bgImage.naturalWidth > 0) {
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+    } else {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } 
+
+    
 
     drawBlocks();
     updateBallRotation();

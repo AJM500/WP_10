@@ -1,27 +1,28 @@
 //볼,바 이미지 선언
 window.barImage = new Image();
-window.barImage.src = "res/gameImage/Grass_bar.png";
+window.barImage.src = "res/gameImage/Fire_bar.png";
 window.ballImage = new Image();
-window.ballImage.src = "res/gameImage/Grass_ball.png";
+window.ballImage.src = "res/gameImage/Fire_ball.png";
+window.bgImageSrc = "res/gameImage/stage3_1.png";
 //외곽 블럭 이미지셋 선언
 const generalBlockImgs = [
     new Image(),
     new Image(),
     new Image()
 ];
-generalBlockImgs[0].src = "res/gameImage/General_block1_32.png";
-generalBlockImgs[1].src = "res/gameImage/General_block2_32.png";
-generalBlockImgs[2].src = "res/gameImage/General_block3_32.png";
+generalBlockImgs[0].src = "res/gameImage/General_block1.png";
+generalBlockImgs[1].src = "res/gameImage/General_block2.png";
+generalBlockImgs[2].src = "res/gameImage/General_block3.png";
 
-// [Stage1] grass block 이미지셋 선언 (blockImgs)
+// [Stage6] fire block 이미지셋 선언 (blockImgs)
 const blockImgs = [
     new Image(),
     new Image(),
     new Image()
 ];
-blockImgs[0].src = "res/gameImage/Grass_block1_32.png";
-blockImgs[1].src = "res/gameImage/Grass_block2_32.png";
-blockImgs[2].src = "res/gameImage/Grass_block3_32.png";
+blockImgs[0].src = "res/gameImage/Fire_block1_25.png";
+blockImgs[1].src = "res/gameImage/Fire_block2_25.png";
+blockImgs[2].src = "res/gameImage/Fire_block3_25.png";
 // 게임 시작 플래그 추가 (window 객체 사용으로 전역 공유)
 if (typeof window.gameStarted === 'undefined') {
     window.gameStarted = false;
@@ -43,7 +44,7 @@ blockImgs.forEach(img => {
 });
 //블럭 객체
 class Block {
-    constructor(x, y, hits = 99,imgIdx = null, type="grass", imgSet = blockImgs) {
+    constructor(x, y, hits = 99,imgIdx = null, type="fire", imgSet = blockImgs) {
         this.x = x;         // x좌표
         this.y = y;         // y좌표
         this.width = 25;    // 블럭 너비 (64로 맞춤)
@@ -51,7 +52,7 @@ class Block {
         this.hits = hits;   // 블럭 체력(1~3)
         this.status = 1;    // 살아있으면 1, 깨지면 0
         this.imgIdx = imgIdx; // 내부 블럭만 랜덤 이미지
-        this.type = type; // "grass" or "general"
+        this.type = type; // "fire" or "general"
         this.imgSet = imgSet;
     }
 }
@@ -94,38 +95,39 @@ for (let x = 650; x <= 730; x += 25)
 
 
 
-// [6] 왼쪽 빨간(용암) grass 블럭 (위)
+// [6] 왼쪽 빨간(용암) 
 for (let x = 275; x <= 400; x += 25) {
-    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
-// [7] 오른쪽 빨간(용암) grass 블럭 (위)
+// [7] 오른쪽 빨간(용암)
 for (let x = 575; x <= 700; x += 25) {
-    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
-// [8] 왼쪽 빨간(용암) grass 블럭 (아래)
+// [8] 왼쪽 빨간(용암)
 for (let x = 275; x <= 400; x += 25) {
-    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
-// [9] 오른쪽 빨간(용암) grass 블럭 (아래)
+// [9] 오른쪽 빨간(용암) 
 for (let x = 575; x <= 700; x += 25) {
-    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
 for (let x = 150; x <= 230; x += 25) {
-    blocks.push(new Block(x, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
 for (let x = 750; x <= 830; x += 25) {
-    blocks.push(new Block(x, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
+    blocks.push(new Block(x, 250, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "fire", blockImgs));
 }
 
 // window 객체에 할당
 window.blocks = blocks;
 window.blockImgs = blockImgs;
 window.generalBlockImgs = generalBlockImgs;
+window.fireBlockImgs = blockImgs;
 
 // 모든 이미지 로딩 완료 체크 및 게임 시작 신호
 let totalImages = blockImgs.length + generalBlockImgs.length + 2;
