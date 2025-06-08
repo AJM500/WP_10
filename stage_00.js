@@ -72,21 +72,10 @@ for (let y = 40; y < 600; y += 40) {
 }
 
 // === [3] 내부블럭 ===
-for(let x = 300; x <= 620; x += 40)
+for(let x = 460; x <= 490; x += 40)
     blocks.push(new Block(x, 160, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
-for(let x = 140; x <= 260; x += 40)
-    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
-for(let x = 660; x <= 780; x += 40)
-    blocks.push(new Block(x, 200, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 
-for(let x = 140; x <= 260; x += 40)
-    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
-for(let x = 660; x <= 780; x += 40)
-    blocks.push(new Block(x, 350, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
-
-for(let x = 300; x <= 620; x += 80)
-    blocks.push(new Block(x, 310, Math.floor(Math.random()*3)+1, Math.floor(Math.random()*3), "grass", blockImgs));
 
 // window 객체에 할당
 window.blocks = blocks;
