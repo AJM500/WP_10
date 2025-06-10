@@ -132,7 +132,7 @@ function startGameWhenReady() {
 }
 
 // 초기 게임 시작 체크 (3초 후 시작)
-setTimeout(startGameWhenReady, 50);
+setTimeout(startGameWhenReady, 0);
 
 // 마우스 이동 이벤트
 canvas.addEventListener('mousemove', mouseMoveHandler);
@@ -315,7 +315,8 @@ function drawScoreAndLives() {
     }
 }
 
-let isPaused = false;
+// 이걸로 첫 시작 일시정지
+let isPaused = true;
 
 // 오버레이 show/hide 함수
 function showPauseOverlay() {
@@ -483,6 +484,181 @@ document.addEventListener("keydown", function(e) {
         togglePause();
     }
 });
+
+
+function showBlockMessage(parentBox, msg) {
+    // 이미 표시된 메시지가 있다면 제거
+    const old = parentBox.querySelector('.block-msg');
+    if (old) old.remove();
+
+    // 메시지 요소 생성 및 스타일 지정
+    const msgDiv = document.createElement("div");
+    msgDiv.innerText = msg;
+    msgDiv.className = "block-msg";
+    msgDiv.style.margin = "20px 0 0 0";
+    msgDiv.style.padding = "16px 32px";
+    msgDiv.style.background = "#fffbe8";
+    msgDiv.style.border = "1px solid #ffd36e";
+    msgDiv.style.borderRadius = "8px";
+    msgDiv.style.fontSize = "1.1rem";
+    msgDiv.style.color = "#c67c1f";
+    msgDiv.style.textAlign = "center";
+    msgDiv.style.boxShadow = "0 2px 8px #ffeb99a0";
+
+    parentBox.appendChild(msgDiv);
+}
+function styleButton(btn, color="#539afc") {
+    btn.style.padding = "12px 32px";
+    btn.style.margin = "0 0 8px 0";
+    btn.style.fontSize = "1.1rem";
+    btn.style.border = "none";
+    btn.style.borderRadius = "999px";
+    btn.style.background = color;
+    btn.style.color = "#fff";
+    btn.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+    btn.style.cursor = "pointer";
+    btn.style.transition = "background 0.2s, transform 0.2s";
+    btn.onmouseover = () => {
+        
+        btn.style.transform = "translateY(-2px) scale(1.2)";
+    };
+    btn.onmouseout = () => {
+        btn.style.background = color;
+        btn.style.transform = "none";
+    };
+}
+
+showBarSelectMenu();
+function showBarSelectMenu() {
+     
+    // 메뉴 UI 생성
+    const menu = document.createElement("div");
+    menu.style.position = "absolute";
+    menu.style.left = "0";
+    menu.style.top = "0";
+    menu.style.width = "100vw";
+    menu.style.height = "100vh";
+    menu.style.background = "rgba(0,0,0,0.6)";
+    menu.style.display = "flex";
+    menu.style.justifyContent = "center";
+    menu.style.alignItems = "center";
+    menu.style.zIndex = 9999;
+
+    const box = document.createElement("div");
+    box.style.background = "#fff";
+    box.style.padding = "30px";
+    box.style.borderRadius = "16px";
+    box.style.display = "flex";
+    box.style.flexDirection = "column";
+    box.style.alignItems = "center";
+    box.style.gap = "20px";
+
+
+    box.innerHTML = "<h2>사용할 속성을 선택하세요</h2>";
+
+    function completeSelection() {
+        document.body.removeChild(menu);
+        
+        // 일시정지 해제 (토글이 아닌 직접 false 설정)
+        if (typeof isPaused !== 'undefined') {
+            isPaused = false;
+        }
+        
+        // 게임 재개
+        if (typeof requestAnimationFrame !== 'undefined' && typeof draw === 'function') {
+            requestAnimationFrame(draw);
+        }
+        
+        console.log("속성 선택 완료, 게임 재개");
+    }
+
+    // basic
+    const btnBasic = document.createElement("button");
+    btnBasic.innerText = "기본";
+    styleButton(btnBasic, "#bdbdbd"); // 회색
+    btnBasic.onclick = () => {
+
+        window.barImage.src = "res/gameImage/basic_bar.png";
+        window.ballImage.src = "res/gameImage/basic_ball.png";
+        completeSelection()
+         
+        
+    };
+    box.appendChild(btnBasic);
+
+    // fire
+    const btnFire = document.createElement("button");
+    if(sessionStorage.getItem('grasspocketmon')){
+        btnFire.innerText = "🔥 불 속성";
+        styleButton(btngrass, "#fd4949"); // 빨강
+    }
+    else{
+        btnFire.innerText = "🔥 불 속성 (미획득)";
+        styleButton(btnFire, "#855555"); // 빨간색
+    }
+    
+    btnFire.onclick = () => {
+        if (!sessionStorage.getItem("firepocketmon")){
+            showBlockMessage(box, "불 타입 포켓몬이 없습니다");
+            return;
+        }
+        window.barImage.src = "res/gameImage/Fire_bar.png";
+        window.ballImage.src = "res/gameImage/Fire_ball.png";
+        completeSelection()
+        
+    };
+    box.appendChild(btnFire);
+
+    // grass
+    const btngrass = document.createElement("button");
+    if(sessionStorage.getItem('grasspocketmon')){
+        btngrass.innerText = "🌿 풀 속성";
+        styleButton(btngrass, "#38d37a"); // 초록
+    }
+    else{
+        btngrass.innerText = "🌿 풀 속성 (미획득)";
+        styleButton(btngrass, "#739c84"); // 초록
+    }
+    
+    btngrass.onclick = () => {
+         if(!sessionStorage.getItem('grasspocketmon')){
+            showBlockMessage(box, "풀 타입 포켓몬이 없습니다");
+            return;
+        }
+        window.barImage.src = "res/gameImage/Grass_bar.png";
+        window.ballImage.src = "res/gameImage/Grass_ball.png";
+        completeSelection()
+        
+    };
+    box.appendChild(btngrass);
+
+    const btnwater = document.createElement("button");
+    if(sessionStorage.getItem('grasspocketmon')){
+        btnwater.innerText = "💧 물 속성";
+        styleButton(btnwater, "#45b6ff"); // 파란색
+    }
+    else{
+        btnwater.innerText = "💧 물 속성 (미획득)";
+        styleButton(btnwater, "#59819c"); // 파란색
+    }
+    
+    btnwater.onclick = () => {
+        if(!sessionStorage.getItem('waterpocketmon')){
+            showBlockMessage(box, "물 타입 포켓몬이 없습니다");
+            return;
+        }
+        window.barImage.src = "res/gameImage/Water_bar.png";
+        window.ballImage.src = "res/gameImage/Water_ball.png";
+        completeSelection()
+       
+    };
+    box.appendChild(btnwater);
+
+    
+
+    menu.appendChild(box);
+    document.body.appendChild(menu);
+}
 
 function draw() {
    
