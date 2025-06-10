@@ -8,6 +8,7 @@ if (typeof window.gameStarted === 'undefined') {
 let bgImage = null;
 let bgImageLoaded = false;
 
+
 if (window.bgImageSrc) {
     bgImage = new Image();
     bgImage.src = window.bgImageSrc;
@@ -98,7 +99,6 @@ window.onStageReady = function() {
     console.log("스테이지 준비 완료! 게임 시작");
     resetGameState();
 
-   
     
     if (!window.gameStarted) {
         window.gameStarted = true;
@@ -127,12 +127,12 @@ function startGameWhenReady() {
         requestAnimationFrame(draw);
     } else if (!window.gameStarted) {
         // 500ms 후 다시 확인 (더 여유있게)
-        setTimeout(startGameWhenReady, 500);
+        setTimeout(startGameWhenReady, 50);
     }
 }
 
 // 초기 게임 시작 체크 (3초 후 시작)
-setTimeout(startGameWhenReady, 1000);
+setTimeout(startGameWhenReady, 50);
 
 // 마우스 이동 이벤트
 canvas.addEventListener('mousemove', mouseMoveHandler);
@@ -166,13 +166,12 @@ function collisionDetection() {
                 y - ballRadius < b.y + b.height;
 
            if (collided) {
-             if (b.hits !== -1) {   // 체력이 -1이면 깎지마!
-             b.hits--;
-             if (b.hits <= 0) {
-                  b.status = 0;
-                 score += 10;
+            if (b.status === 1) {
+                b.hit(); // 🔷 Block의 hit 메소드 호출
+                if (b.status === 0) { 
+                     score += 10; // 블록이 깨졌으면 점수 추가
                  }
-             }
+              }
 
                // 충돌 방향 판별
                 const prevX = x - dx;
@@ -486,7 +485,7 @@ document.addEventListener("keydown", function(e) {
 });
 
 function draw() {
-
+   
     if (isPaused || isGameOver) return; //일시정지관련 + 게임 오버 변수 추가
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
