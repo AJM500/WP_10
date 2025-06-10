@@ -588,9 +588,9 @@ function showBarSelectMenu() {
 
     // fire
     const btnFire = document.createElement("button");
-    if(sessionStorage.getItem('grasspocketmon')){
+    if(sessionStorage.getItem('firepocketmon')){
         btnFire.innerText = "🔥 불 속성";
-        styleButton(btngrass, "#fd4949"); // 빨강
+        styleButton(btnFire, "#fd4949"); // 빨강
     }
     else{
         btnFire.innerText = "🔥 불 속성 (미획득)";
@@ -633,7 +633,7 @@ function showBarSelectMenu() {
     box.appendChild(btngrass);
 
     const btnwater = document.createElement("button");
-    if(sessionStorage.getItem('grasspocketmon')){
+    if(sessionStorage.getItem('waterpocketmon')){
         btnwater.innerText = "💧 물 속성";
         styleButton(btnwater, "#45b6ff"); // 파란색
     }
